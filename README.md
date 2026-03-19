@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+This is a [Next.js](https://nextjs.org) project for tracking personal loans with Google sign-in, borrower acknowledgment, and email notifications.
 
 ## Getting Started
 
-First, run the development server:
+First, install dependencies and run the development server:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Add these values to your local `.env`:
 
-## Learn More
+```bash
+DATABASE_URL="..."
+NEXTAUTH_SECRET="..."
+NEXTAUTH_URL="http://localhost:3000"
+GOOGLE_CLIENT_ID="..."
+GOOGLE_CLIENT_SECRET="..."
 
-To learn more about Next.js, take a look at the following resources:
+SMTP_HOST="smtp.gmail.com"
+SMTP_PORT="587"
+SMTP_USER="your-email@gmail.com"
+SMTP_PASS="your-app-password"
+SMTP_FROM="Saath Circle <your-email@gmail.com>"
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+For Gmail, use an App Password instead of your normal account password.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Prefer copying from `.env.example` so local and production configuration stay aligned.
 
-## Deploy on Vercel
+## Borrower Email Flow
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+When a lender creates a new loan, the app:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Creates or finds the borrower by email.
+2. Stores the loan as `PENDING`.
+3. Sends the borrower an email with a sign-in link that returns them to the loan details page so they can acknowledge it.
+
+## Verification
+
+Run these before shipping:
+
+```bash
+npm run verify
+npm run check:env
+```
+
+For deployment and launch:
+- [DEPLOYMENT.md](./DEPLOYMENT.md)
+- [RELEASE_CHECKLIST.md](./RELEASE_CHECKLIST.md)
+- [PRODUCTION_READINESS.md](./PRODUCTION_READINESS.md)
+- [SMOKE_TEST.md](./SMOKE_TEST.md)
