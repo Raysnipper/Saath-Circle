@@ -1,9 +1,14 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
-import type { Transaction } from "@prisma/client";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendLenderRepaymentNotification } from "@/lib/email";
+
+type LoanTransaction = {
+  id: string;
+  amount: number;
+  status: string;
+};
 
 export async function POST(
   req: Request,
@@ -48,8 +53,8 @@ export async function POST(
     }
 
     const reservedAmount = loan.transactions
-      .filter((transaction: Transaction) => transaction.status !== "REJECTED")
-      .reduce((sum: number, transaction: Transaction) => sum + transaction.amount, 0);
+      .filter((transaction: LoanTransaction) => transaction.status !== "REJECTED")
+      .reduce((sum: number, transaction: LoanTransaction) => sum + transaction.amount, 0);
 
     const availableOutstanding = loan.amount - reservedAmount;
 
@@ -122,7 +127,7 @@ export async function PATCH(
     }
 
     const existingTransaction = loan.transactions.find(
-      (transaction: Transaction) => transaction.id === transactionId
+      (transaction: LoanTransaction) => transaction.id === transactionId
     );
 
     if (!existingTransaction) {
@@ -151,11 +156,11 @@ export async function PATCH(
 
     if (status === "CONFIRMED") {
       const confirmedTotal = loan.transactions
-        .map((entry: Transaction) =>
+        .map((entry: LoanTransaction) =>
           entry.id === transactionId ? { ...entry, status: "CONFIRMED" } : entry
         )
-        .filter((entry: Transaction) => entry.status === "CONFIRMED")
-        .reduce((sum: number, entry: Transaction) => sum + entry.amount, 0);
+        .filter((entry: LoanTransaction) => entry.status === "CONFIRMED")
+        .reduce((sum: number, entry: LoanTransaction) => sum + entry.amount, 0);
 
       if (confirmedTotal >= loan.amount) {
         await prisma.loan.update({
