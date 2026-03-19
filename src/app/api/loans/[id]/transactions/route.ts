@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
+import type { Transaction } from "@prisma/client";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendLenderRepaymentNotification } from "@/lib/email";
@@ -47,8 +48,8 @@ export async function POST(
     }
 
     const reservedAmount = loan.transactions
-      .filter((transaction) => transaction.status !== "REJECTED")
-      .reduce((sum, transaction) => sum + transaction.amount, 0);
+      .filter((transaction: Transaction) => transaction.status !== "REJECTED")
+      .reduce((sum: number, transaction: Transaction) => sum + transaction.amount, 0);
 
     const availableOutstanding = loan.amount - reservedAmount;
 
@@ -121,7 +122,7 @@ export async function PATCH(
     }
 
     const existingTransaction = loan.transactions.find(
-      (transaction) => transaction.id === transactionId
+      (transaction: Transaction) => transaction.id === transactionId
     );
 
     if (!existingTransaction) {
@@ -150,11 +151,11 @@ export async function PATCH(
 
     if (status === "CONFIRMED") {
       const confirmedTotal = loan.transactions
-        .map((entry) =>
+        .map((entry: Transaction) =>
           entry.id === transactionId ? { ...entry, status: "CONFIRMED" } : entry
         )
-        .filter((entry) => entry.status === "CONFIRMED")
-        .reduce((sum, entry) => sum + entry.amount, 0);
+        .filter((entry: Transaction) => entry.status === "CONFIRMED")
+        .reduce((sum: number, entry: Transaction) => sum + entry.amount, 0);
 
       if (confirmedTotal >= loan.amount) {
         await prisma.loan.update({
