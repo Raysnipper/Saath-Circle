@@ -1,6 +1,10 @@
 # Next Session Todo
 
 ## Current Status
+- **Successfully deployed the V1 production app to Vercel!**
+- Resolved Vercel build issues by adding `prisma generate` to `postinstall`.
+- Resolved Google OAuth `redirect_uri_mismatch` and `invalid_client` issues by correcting `NEXTAUTH_URL` and `GOOGLE_CLIENT_SECRET` in Vercel.
+- Synced Prisma schema to the live production Neon database using `prisma db push`.
 - Dashboard, search, filters, and mobile-first card refinement are in a strong V1 state.
 - `Completed` stayed as the dashboard filter label.
 - History/detail page exists and now uses precise timestamps:
@@ -21,20 +25,9 @@
   - `.env.example`
 
 ## Immediate Next Steps
-- Rotate current local/test secrets before production use:
-  - database credentials
-  - `NEXTAUTH_SECRET`
-  - Google OAuth secret
-  - SMTP password
-- Use `VERCEL_ENV_CHECKLIST.md` to enter production env vars cleanly.
-- Use `LAUNCH_RUNBOOK.md` for the first live release sequence.
-- Set up production environment variables in hosting.
-- Decide final production hosting stack:
-  - app hosting
-  - production database/project
-  - production email sender/account
-- Run production-like smoke test with two real accounts.
-- Validate auth callbacks, email delivery, and completed/history flows in production.
+- Run the full production smoke test with two real accounts (`SMOKE_TEST.md`).
+- Validate email delivery and completed/history flows in production.
+- Monitor Vercel logs for any runtime anomalies during the smoke test.
 
 ## Important Context
 - Prisma client has been regenerated.

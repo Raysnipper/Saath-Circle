@@ -48,7 +48,7 @@ export function Nav() {
             </div>
           ) : (
             <Button
-              size="sm"
+              className="h-9 px-4 rounded-full"
               onClick={() =>
                 signIn("google", undefined, { prompt: "select_account" })
               }

@@ -7,6 +7,7 @@ import { getLastActivity } from "@/lib/loan-history";
 import { LoanCard } from "@/components/LoanCard";
 import { LoanForm } from "@/components/LoanForm";
 import { Nav } from "@/components/Nav";
+import { LandingHero } from "@/components/LandingHero";
 
 type LoanWithRelations = Prisma.LoanGetPayload<{
   include: {
@@ -153,37 +154,17 @@ export default async function Home({
       <Nav />
       <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 py-5 sm:px-6 sm:py-6 lg:px-8">
         {!session ? (
-          <div className="flex min-h-[70vh] flex-col items-center justify-center text-center">
-            <div className="max-w-4xl space-y-8 rounded-[2rem] border border-white/60 bg-white/65 px-8 py-14 shadow-[0_24px_70px_rgba(93,72,52,0.1)] backdrop-blur-sm">
-              <p className="text-xs uppercase tracking-[0.35em] text-muted-foreground">
-                Saath Circle
-              </p>
-              <h1 className="font-brand text-6xl font-semibold leading-none text-foreground sm:text-8xl">
-                Shared balances,
-                <br />
-                held with care.
-              </h1>
-              <p className="mx-auto max-w-2xl text-lg leading-8 text-muted-foreground sm:text-xl">
-                A private place to keep shared balances clear and comfortable,
-                without turning personal money into awkward conversation.
-              </p>
-            </div>
-          </div>
+          <LandingHero />
         ) : (
           <div className="space-y-5 sm:space-y-7">
             <header className="grid gap-3 rounded-[1.5rem] border border-white/70 bg-white/60 p-4 shadow-[0_14px_32px_rgba(93,72,52,0.08)] backdrop-blur-sm sm:p-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
-              <div className="space-y-2.5">
-                <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
-                  Saath Circle
+              <div className="space-y-1.5">
+                <h1 className="font-brand text-[2.8rem] font-semibold leading-none text-foreground sm:text-5xl lg:text-[3.5rem]">
+                  Money Between People
+                </h1>
+                <p className="max-w-xl text-sm leading-5 text-muted-foreground sm:text-base sm:leading-6">
+                  Stay clear on who owes what, without awkward reminders.
                 </p>
-                <div className="space-y-1.5">
-                  <h1 className="font-brand text-[2.8rem] font-semibold leading-none text-foreground sm:text-5xl lg:text-[3.5rem]">
-                    Money Between People
-                  </h1>
-                  <p className="max-w-xl text-sm leading-5 text-muted-foreground sm:text-base sm:leading-6">
-                    Stay clear on who owes what, without awkward reminders.
-                  </p>
-                </div>
               </div>
               <div className="flex justify-start md:justify-end">
                 <LoanForm />
@@ -248,7 +229,7 @@ export default async function Home({
                         type="search"
                         defaultValue={query}
                         placeholder="Search by person or title"
-                        className="h-9 min-w-0 basis-full rounded-full border border-border bg-white/70 px-4 text-[0.74rem] text-foreground outline-none transition placeholder:text-muted-foreground focus:border-ring focus:ring-3 focus:ring-ring/30 sm:h-10 sm:min-w-[18rem] sm:basis-auto sm:flex-1 sm:text-[0.8rem] lg:max-w-[26rem]"
+                        className="h-9 min-w-0 basis-full flex-1 rounded-full border border-border bg-white/70 px-4 text-[0.74rem] text-foreground outline-none transition placeholder:text-muted-foreground focus:border-ring focus:ring-3 focus:ring-ring/30 sm:h-10 sm:min-w-[18rem] sm:basis-auto sm:text-[0.8rem]"
                       />
                       <button
                         type="submit"

@@ -34,6 +34,13 @@ type LenderRepaymentInput = {
 
 type EmailResult = { sent: true } | { sent: false; reason: string };
 
+function capitalizeName(name: string) {
+  return name
+    .split(" ")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
+    .join(" ");
+}
+
 function getBaseUrl() {
   return getOptionalEnv("NEXTAUTH_URL") || "http://localhost:3000";
 }
@@ -125,17 +132,17 @@ export async function sendBorrowerLoanNotification({
   amount,
 }: BorrowerNotificationInput): Promise<EmailResult> {
   const acknowledgeUrl = `${getBaseUrl()}/acknowledge/${loanId}`;
-  const borrowerDisplay = borrowerName || borrowerEmail;
-  const lenderDisplay = lenderName || lenderEmail || "Someone";
+  const borrowerDisplay = borrowerName ? capitalizeName(borrowerName) : borrowerEmail;
+  const lenderDisplay = lenderName ? capitalizeName(lenderName) : lenderEmail || "Someone";
 
   return sendEmail({
     to: borrowerEmail,
-    subject: `${lenderDisplay} asked you to acknowledge a loan on DM Loan`,
+    subject: `${lenderDisplay} asked you to acknowledge a loan on Saath Circle`,
     text: [
       `Hi ${borrowerDisplay},`,
       "",
       `${lenderDisplay} recorded a loan for INR ${amount.toFixed(2)}${loanTitle ? ` (${loanTitle})` : ""}.`,
-      "Please review and acknowledge it in DM Loan.",
+      "Please review and acknowledge it in Saath Circle.",
       "",
       `Open this link to sign in and review the loan: ${acknowledgeUrl}`,
     ].join("\n"),
@@ -143,7 +150,7 @@ export async function sendBorrowerLoanNotification({
       <div style="font-family: Georgia, serif; line-height: 1.6; color: #1f1f1f;">
         <p>Hi ${borrowerDisplay},</p>
         <p><strong>${lenderDisplay}</strong> recorded a loan for <strong>INR ${amount.toFixed(2)}</strong>${loanTitle ? ` (${loanTitle})` : ""}.</p>
-        <p>Please review and acknowledge it in DM Loan.</p>
+        <p>Please review and acknowledge it in Saath Circle.</p>
         <p>
           <a href="${acknowledgeUrl}" style="display:inline-block;padding:12px 18px;background:#111;color:#fff;text-decoration:none;border-radius:999px;">
             Review Loan
@@ -165,12 +172,12 @@ export async function sendLenderAcknowledgementNotification({
   amount,
 }: LenderAcknowledgementInput): Promise<EmailResult> {
   const loanUrl = `${getBaseUrl()}/loan/${loanId}`;
-  const lenderDisplay = lenderName || lenderEmail;
-  const borrowerDisplay = borrowerName || borrowerEmail || "Your borrower";
+  const lenderDisplay = lenderName ? capitalizeName(lenderName) : lenderEmail;
+  const borrowerDisplay = borrowerName ? capitalizeName(borrowerName) : borrowerEmail || "Your borrower";
 
   return sendEmail({
     to: lenderEmail,
-    subject: `${borrowerDisplay} acknowledged your loan on DM Loan`,
+    subject: `${borrowerDisplay} acknowledged your loan on Saath Circle`,
     text: [
       `Hi ${lenderDisplay},`,
       "",
@@ -202,12 +209,12 @@ export async function sendLenderRepaymentNotification({
   outstandingAmount,
 }: LenderRepaymentInput): Promise<EmailResult> {
   const loanUrl = `${getBaseUrl()}/loan/${loanId}`;
-  const lenderDisplay = lenderName || lenderEmail;
-  const borrowerDisplay = borrowerName || borrowerEmail || "Your borrower";
+  const lenderDisplay = lenderName ? capitalizeName(lenderName) : lenderEmail;
+  const borrowerDisplay = borrowerName ? capitalizeName(borrowerName) : borrowerEmail || "Your borrower";
 
   return sendEmail({
     to: lenderEmail,
-    subject: `${borrowerDisplay} recorded a repayment on DM Loan`,
+    subject: `${borrowerDisplay} recorded a repayment on Saath Circle`,
     text: [
       `Hi ${lenderDisplay},`,
       "",
