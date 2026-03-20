@@ -211,11 +211,11 @@ export default async function Home({
                   </h2>
                 </div>
                 <div className="flex flex-col gap-1.5 lg:w-[41rem] lg:items-end">
-                  <div className="flex justify-start lg:w-full lg:justify-end">
+                  <div className="flex flex-col gap-2 w-full lg:w-fit">
                     <form
                       action="/"
                       method="get"
-                      className="flex w-full flex-wrap gap-2 sm:flex-nowrap lg:w-full lg:justify-end"
+                      className="flex w-full flex-wrap gap-2 sm:flex-nowrap"
                     >
                       {filter !== "all" && (
                         <input type="hidden" name="filter" value={filter} />
@@ -233,21 +233,20 @@ export default async function Home({
                       />
                       <button
                         type="submit"
-                        className="inline-flex h-9 items-center justify-center rounded-full bg-primary px-4 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-primary-foreground transition hover:bg-primary/95 sm:h-10 sm:text-[0.72rem]"
+                        className="inline-flex h-9 shrink-0 items-center justify-center rounded-full bg-primary px-4 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-primary-foreground transition hover:bg-primary/95 sm:h-10 sm:text-[0.72rem]"
                       >
                         Search
                       </button>
                       {query && (
                         <Link
                           href={filter === "all" ? "/" : `/?filter=${filter}`}
-                          className="inline-flex h-9 items-center justify-center rounded-full border border-border bg-white/70 px-4 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground transition hover:bg-white hover:text-foreground sm:h-10 sm:text-[0.72rem]"
+                          className="inline-flex h-9 shrink-0 items-center justify-center rounded-full border border-border bg-white/70 px-4 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground transition hover:bg-white hover:text-foreground sm:h-10 sm:text-[0.72rem]"
                         >
                           Clear
                         </Link>
                       )}
                     </form>
-                  </div>
-                  <div className="-mx-1 flex flex-nowrap gap-2 overflow-x-auto px-1 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0 lg:w-full lg:justify-end">
+                    <div className="-mx-1 flex flex-nowrap justify-start gap-2 overflow-x-auto px-1 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
                     {filters.map((item) => {
                       const active = filter === item.key;
                       const href =
@@ -269,6 +268,7 @@ export default async function Home({
                   </div>
                 </div>
               </div>
+            </div>
 
               {visibleLoans.length === 0 ? (
                 <div className="rounded-[1.75rem] border border-dashed border-border/80 bg-white/50 px-6 py-12 text-center text-card-foreground shadow-[0_14px_36px_rgba(93,72,52,0.05)]">
