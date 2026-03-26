@@ -142,7 +142,7 @@ export function LoanCard({
   return (
     <Card
       size="sm"
-      className={`overflow-hidden border-white/70 bg-white/80 shadow-[0_10px_24px_rgba(93,72,52,0.08)] backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:shadow-[0_16px_38px_rgba(93,72,52,0.11)] ${isCompleted ? "border-l-[4px] border-l-stone-300/80 bg-stone-50/70 shadow-[0_8px_18px_rgba(93,72,52,0.06)]" : palette.ring}`}
+      className={`dashboard-card overflow-hidden transition-all hover:-translate-y-1 hover:shadow-xl ${isCompleted ? "!bg-surface/50 opacity-80" : ""}`}
     >
       <CardHeader className="space-y-2 pb-2 sm:space-y-3">
         <div
@@ -340,7 +340,7 @@ export function LoanCard({
         {isCompleted && (
           <Link
             href={`/loan/${loan.id}`}
-            className="inline-flex w-full items-center justify-center rounded-[1rem] border border-stone-300 bg-stone-100 px-3 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-stone-700 transition hover:bg-stone-200 sm:w-auto sm:rounded-[1.1rem]"
+            className="inline-flex w-full items-center justify-center rounded-full border border-outline-variant/30 bg-white/60 px-5 py-2.5 text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface/60 transition hover:bg-white hover:text-primary sm:w-auto"
           >
             View History
           </Link>

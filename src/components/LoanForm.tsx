@@ -72,12 +72,12 @@ export function LoanForm() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger className="inline-flex h-10 items-center justify-center gap-2 rounded-full border border-primary/10 bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-[0_12px_30px_rgba(89,53,40,0.16)] transition hover:-translate-y-0.5 hover:bg-primary/95 sm:h-11 sm:px-5">
-        <Plus className="h-4 w-4" /> Add Record
+      <DialogTrigger className="bg-primary text-on-primary px-6 py-3 sm:py-2.5 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest hover:scale-105 hover:bg-primary-container hover:text-primary hover:shadow-md transition-all flex items-center gap-2">
+        <Plus className="h-4 w-4" strokeWidth={3} /> ADD RECORD
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[470px] border-white/70 bg-background/95 shadow-2xl">
+      <DialogContent className="sm:max-w-[470px] dashboard-card border-none">
         <DialogHeader>
-          <DialogTitle className="font-brand text-3xl font-semibold">
+          <DialogTitle className="font-extrabold tracking-tighter text-3xl text-primary">
             Add a shared record
           </DialogTitle>
           <DialogDescription>

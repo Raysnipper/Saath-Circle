@@ -8,53 +8,42 @@ export function Nav() {
   const { data: session, status } = useSession();
 
   return (
-    <nav className="sticky top-0 z-30 border-b border-border/70 bg-background/75 backdrop-blur-xl">
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+    <nav className="sticky top-0 w-full z-50 bg-surface/40 backdrop-blur-xl border-b border-outline-variant/20">
+      <div className="flex justify-between items-center px-6 lg:px-12 py-4 max-w-[1600px] mx-auto">
         <Link
           href="/"
-          className="flex min-w-0 items-center gap-3 rounded-[1.25rem] transition hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
+          className="flex min-w-0 items-center hover:opacity-90 transition-opacity"
         >
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[1.1rem] border border-white/60 bg-white/70 shadow-sm sm:h-11 sm:w-11">
-            <span className="font-brand text-xl font-semibold leading-none text-primary sm:text-2xl">
-              S
-            </span>
-          </div>
-          <div className="min-w-0">
-            <div className="truncate font-brand text-[1.7rem] font-semibold tracking-tight text-foreground sm:text-3xl">
-              Saath Circle
-            </div>
-            <div className="hidden text-[0.68rem] uppercase tracking-[0.22em] text-muted-foreground sm:block">
-              Private Shared Balances
-            </div>
-          </div>
+          <div className="text-xl font-extrabold tracking-tighter text-primary">SAATH CIRCLE</div>
         </Link>
 
         <div className="shrink-0">
           {status === "loading" ? (
-            <div className="h-10 w-28 animate-pulse rounded-full bg-muted" />
+            <div className="h-10 w-28 animate-pulse rounded-full bg-white/40" />
           ) : session ? (
-            <div className="flex items-center gap-2 sm:gap-3">
-              <div className="hidden md:flex flex-col items-end rounded-2xl border border-white/60 bg-white/60 px-3 py-1.5 leading-tight shadow-sm">
-                <span className="text-sm font-semibold text-foreground">
+            <div className="flex items-center gap-4">
+              <div className="hidden md:flex flex-col items-end px-3 py-1.5 leading-tight">
+                <span className="text-sm font-bold text-primary">
                   {session.user?.name || "Signed in"}
                 </span>
-                <span className="text-xs text-muted-foreground">
+                <span className="text-xs text-on-surface/50 font-medium">
                   {session.user?.email}
                 </span>
               </div>
-              <Button variant="outline" size="sm" onClick={() => signOut()}>
+              <button
+                onClick={() => signOut()}
+                className="bg-white text-primary px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest hover:scale-105 hover:bg-surface-container hover:shadow-md transition-all"
+              >
                 Sign Out
-              </Button>
+              </button>
             </div>
           ) : (
-            <Button
-              className="h-9 px-4 rounded-full"
-              onClick={() =>
-                signIn("google", undefined, { prompt: "select_account" })
-              }
+            <button
+              onClick={() => signIn("google", undefined, { prompt: "select_account" })}
+              className="bg-primary text-on-primary px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-primary-container transition-all"
             >
-              Sign In with Google
-            </Button>
+              Sign In
+            </button>
           )}
         </div>
       </div>

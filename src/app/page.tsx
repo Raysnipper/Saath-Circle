@@ -150,19 +150,19 @@ export default async function Home({
   } satisfies Record<(typeof filters)[number]["key"], number>;
 
   return (
-    <div className="min-h-screen flex flex-col text-foreground">
-      <Nav />
-      <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 py-5 sm:px-6 sm:py-6 lg:px-8">
+    <div className={`min-h-screen flex flex-col ${session ? 'text-foreground' : ''}`}>
+      {session && <Nav />}
+      <main className={!session ? "flex-1" : "mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 py-5 sm:px-6 sm:py-6 lg:px-8"}>
         {!session ? (
           <LandingHero />
         ) : (
           <div className="space-y-5 sm:space-y-7">
-            <header className="grid gap-3 rounded-[1.5rem] border border-white/70 bg-white/60 p-4 shadow-[0_14px_32px_rgba(93,72,52,0.08)] backdrop-blur-sm sm:p-5 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
-              <div className="space-y-1.5">
-                <h1 className="font-brand text-[2.8rem] font-semibold leading-none text-foreground sm:text-5xl lg:text-[3.5rem]">
+            <header className="dashboard-card grid gap-3 p-4 sm:p-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
+              <div className="space-y-2">
+                <h1 className="text-[2.8rem] tracking-tighter font-extrabold leading-none text-primary sm:text-5xl lg:text-[3.5rem]">
                   Money Between People
                 </h1>
-                <p className="max-w-xl text-sm leading-5 text-muted-foreground sm:text-base sm:leading-6">
+                <p className="max-w-xl text-sm font-medium leading-5 text-on-surface/60 sm:text-base sm:leading-6">
                   Stay clear on who owes what, without awkward reminders.
                 </p>
               </div>
@@ -171,9 +171,9 @@ export default async function Home({
               </div>
             </header>
 
-            <div className="grid gap-2.5 grid-cols-2 sm:grid-cols-3 sm:gap-3">
-              <div className="col-span-2 rounded-[1.35rem] border border-white/70 bg-white/70 p-3.5 shadow-[0_12px_32px_rgba(93,72,52,0.07)] backdrop-blur-sm sm:col-span-1 sm:rounded-[1.5rem] sm:p-5">
-                <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
+            <div className="grid gap-2.5 grid-cols-2 sm:grid-cols-3 sm:gap-4">
+              <div className="dashboard-card col-span-2 p-4 sm:col-span-1 sm:p-5">
+                <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-on-surface/40">
                   Net Balance
                 </p>
                 <div
@@ -183,8 +183,8 @@ export default async function Home({
                   {netBalance.toFixed(2)}
                 </div>
               </div>
-              <div className="rounded-[1.35rem] border border-white/70 bg-white/70 p-3.5 shadow-[0_12px_32px_rgba(93,72,52,0.07)] backdrop-blur-sm sm:rounded-[1.5rem] sm:p-5">
-                <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
+              <div className="dashboard-card p-4 sm:p-5">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface/40">
                   Owed To You
                 </p>
                 <div className="mt-2.5 font-sans text-[1.75rem] font-bold leading-none tracking-tight tabular-nums text-emerald-600 sm:mt-3 sm:text-[2.3rem]">
@@ -192,8 +192,8 @@ export default async function Home({
                   {owedToYou.toFixed(2)}
                 </div>
               </div>
-              <div className="rounded-[1.35rem] border border-white/70 bg-white/70 p-3.5 shadow-[0_12px_32px_rgba(93,72,52,0.07)] backdrop-blur-sm sm:rounded-[1.5rem] sm:p-5">
-                <p className="text-xs uppercase tracking-[0.22em] text-muted-foreground">
+              <div className="dashboard-card p-4 sm:p-5">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface/40">
                   You Owe
                 </p>
                 <div className="mt-2.5 font-sans text-[1.75rem] font-bold leading-none tracking-tight tabular-nums text-rose-500 sm:mt-3 sm:text-[2.3rem]">
@@ -203,10 +203,10 @@ export default async function Home({
               </div>
             </div>
 
-            <section className="space-y-3 sm:space-y-4">
+            <section className="space-y-4 sm:space-y-5">
               <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
                 <div>
-                  <h2 className="font-brand text-[2.4rem] font-semibold leading-none sm:text-[2.25rem]">
+                  <h2 className="text-[2.2rem] font-extrabold tracking-tighter text-primary leading-none sm:text-[2.25rem]">
                     Your Records
                   </h2>
                 </div>
@@ -229,18 +229,18 @@ export default async function Home({
                         type="search"
                         defaultValue={query}
                         placeholder="Search by person or title"
-                        className="h-9 min-w-0 basis-full flex-1 rounded-full border border-border bg-white/70 px-4 text-[0.74rem] text-foreground outline-none transition placeholder:text-muted-foreground focus:border-ring focus:ring-3 focus:ring-ring/30 sm:h-10 sm:min-w-[18rem] sm:basis-auto sm:text-[0.8rem]"
+                        className="h-9 min-w-0 basis-full flex-1 rounded-full border border-outline-variant/30 bg-white/70 px-4 text-[0.74rem] text-primary outline-none transition placeholder:text-on-surface/40 focus:border-primary/30 focus:ring-2 focus:ring-primary/20 sm:h-10 sm:min-w-[18rem] sm:basis-auto sm:text-[0.8rem]"
                       />
                       <button
                         type="submit"
-                        className="inline-flex h-9 shrink-0 items-center justify-center rounded-full bg-primary px-4 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-primary-foreground transition hover:bg-primary/95 sm:h-10 sm:text-[0.72rem]"
+                        className="inline-flex h-9 shrink-0 items-center justify-center rounded-full bg-primary px-5 text-[0.68rem] font-bold uppercase tracking-widest text-on-primary transition hover:opacity-90 sm:h-10 sm:text-[0.72rem]"
                       >
                         Search
                       </button>
                       {query && (
                         <Link
                           href={filter === "all" ? "/" : `/?filter=${filter}`}
-                          className="inline-flex h-9 shrink-0 items-center justify-center rounded-full border border-border bg-white/70 px-4 text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-muted-foreground transition hover:bg-white hover:text-foreground sm:h-10 sm:text-[0.72rem]"
+                          className="inline-flex h-9 shrink-0 items-center justify-center rounded-full border border-outline-variant/30 bg-white/70 px-5 text-[0.68rem] font-bold uppercase tracking-widest text-on-surface/60 transition hover:bg-white hover:text-primary sm:h-10 sm:text-[0.72rem]"
                         >
                           Clear
                         </Link>
@@ -259,7 +259,7 @@ export default async function Home({
                         <Link
                           key={item.key}
                           href={href}
-                          className={`shrink-0 rounded-full border px-3 py-1.5 text-[0.68rem] font-semibold uppercase tracking-[0.16em] transition sm:px-4 sm:py-2 ${active ? "border-primary/30 bg-primary text-primary-foreground" : "border-border bg-white/70 text-muted-foreground hover:bg-white"}`}
+                          className={`shrink-0 rounded-full border px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] transition sm:px-5 sm:py-2 ${active ? "border-primary bg-primary text-on-primary" : "border-outline-variant/30 bg-white/60 text-on-surface/50 hover:bg-white"}`}
                         >
                           {item.label} ({filterCounts[item.key]})
                         </Link>
@@ -271,13 +271,13 @@ export default async function Home({
             </div>
 
               {visibleLoans.length === 0 ? (
-                <div className="rounded-[1.75rem] border border-dashed border-border/80 bg-white/50 px-6 py-12 text-center text-card-foreground shadow-[0_14px_36px_rgba(93,72,52,0.05)]">
-                  <h3 className="font-brand text-3xl font-semibold text-foreground">
+                <div className="dashboard-card border border-dashed border-primary/20 bg-white/20 px-6 py-16 text-center">
+                  <h3 className="text-3xl font-extrabold tracking-tighter text-primary">
                     {query ? "No matching records" : "Nothing here yet"}
                   </h3>
-                  <p className="mx-auto mt-3 max-w-sm text-sm text-muted-foreground">
+                  <p className="mx-auto mt-3 max-w-sm text-sm text-on-surface/60 font-medium">
                     {query
-                      ? "Try a different person name or record title, or clear the search to see everything again."
+                      ? "Try a different person name or record title, or clear the search."
                       : filter === "completed"
                         ? "Completed records will collect here so settled balances stay easy to revisit."
                         : "Add your first shared record to keep balances clear from the very beginning."}

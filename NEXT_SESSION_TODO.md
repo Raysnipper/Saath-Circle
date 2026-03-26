@@ -1,60 +1,40 @@
 # Next Session Todo
 
-## Current Status
+## Current Status (V1 Shipped & Polished)
 - **Successfully deployed the V1 production app to Vercel!**
-- Resolved Vercel build issues by adding `prisma generate` to `postinstall`.
-- Resolved Google OAuth `redirect_uri_mismatch` and `invalid_client` issues by correcting `NEXTAUTH_URL` and `GOOGLE_CLIENT_SECRET` in Vercel.
-- Synced Prisma schema to the live production Neon database using `prisma db push`.
-- Dashboard, search, filters, and mobile-first card refinement are in a strong V1 state.
-- `Completed` stayed as the dashboard filter label.
-- History/detail page exists and now uses precise timestamps:
-  - `Loan.acknowledgedAt`
-  - `Loan.completedAt`
-  - `Transaction.reviewedAt`
-- Completed cards are quieter and include `View History`.
-- `Last activity` is implemented on cards.
-- Nav brand now links back to dashboard, and history page back navigation is more visible.
+- Connected to live production Neon database and pushed Prisma schema.
+- **UI & UX Polish Completed Today:**
+  - Upgraded the unauthenticated landing page to modern 2026 design standards.
+  - Implemented dynamic entrance and breathing glow animations using `framer-motion`.
+  - Removed redundant "SAATH CIRCLE" branding and recentered landing page items.
+  - Fixed the dashboard search bar width so it perfectly left-aligns with the filter pills on desktop.
+- **Email Refinements:**
+  - Standardized the app name to "Saath Circle" across all email templates and subjects.
+  - Added a helper function to automatically Title Case names (e.g., "Dilip Mistry") in all outgoing emails.
+- **Smoke Testing:**
+  - Successfully ran full production smoke tests.
+  - Cleaned up dummy testing data directly via the live Neon SQL Editor.
 
 ## Highest Priority Next
-- Continue from production readiness and deployment prep.
-- Use these files as the working set next session:
-  - `RELEASE_CHECKLIST.md`
-  - `PRODUCTION_READINESS.md`
-  - `DEPLOYMENT.md`
-  - `SMOKE_TEST.md`
-  - `.env.example`
+- Continue monitoring the V1 production release!
+- Make any necessary hotfixes or layout tweaks based on initial live usage.
+- The app is currently fully functional for users to create, acknowledge, and settle shared balances.
 
-## Immediate Next Steps
-- Run the full production smoke test with two real accounts (`SMOKE_TEST.md`).
-- Validate email delivery and completed/history flows in production.
-- Monitor Vercel logs for any runtime anomalies during the smoke test.
-
-## Important Context
-- Prisma client has been regenerated.
-- Database schema was synced with `prisma db push`.
-- Existing records were backfilled for history timestamp fields.
-- There is a migration SQL file for reference:
-  - `prisma/migrations/20260319_history_precision/migration.sql`
-- The database is not fully baselined under Prisma migration history yet.
-  Post-V1, consider creating a proper migration baseline plan.
-
-## Known Release Notes
-- `npm run verify` should be re-run before shipping.
-- Google Fonts build-fetch dependency was removed in favor of a local/system font stack.
-- Remaining release work is mainly production secrets, hosting config, and live smoke testing.
-
-## Nice To Revisit After V1
+## Nice To Revisit After V1 (Fast Follows)
 - Filter chip counter styling polish.
 - Subtle tinted summary cards.
 - Stronger completed/archive dashboard treatment.
-- In-app notifications.
-- Notification preferences.
-- Categories/notes.
-- Export/shareable summaries.
+- In-app push notifications.
+- Notification preferences toggle.
+- Categories/notes on transactions.
+- Export/shareable CSV summaries.
+
+## Important Context
+- Remember that `npx prisma studio` connects to whatever database is in your local `.env`. 
+- To delete records or manipulate live data safely, either use `npx prisma studio` pointed at the production variable, or run direct queries in the Neon Tech SQL Editor.
 
 ## Retrieval
 - Reopen this file next session:
   - `NEXT_SESSION_TODO.md`
-- Or ask:
-  - `Continue from NEXT_SESSION_TODO.md`
-  - `Resume production readiness and deployment prep`
+- Or simply ask:
+  - `What should we work on next?`
