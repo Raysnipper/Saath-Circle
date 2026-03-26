@@ -32,7 +32,7 @@ export function Nav() {
               </div>
               <button
                 onClick={() => signOut()}
-                className="bg-white text-primary px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest hover:scale-105 hover:bg-surface-container hover:shadow-md transition-all"
+                className="bg-white text-primary border border-outline-variant/20 px-6 py-2 rounded-full text-xs font-bold uppercase tracking-widest hover:scale-105 hover:bg-[#2F1400] hover:text-[#FCDDBF] hover:shadow-md transition-all duration-300"
               >
                 Sign Out
               </button>

@@ -200,10 +200,10 @@ export default async function Home({
 
             <section className="space-y-4 sm:space-y-5">
               <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-                <h2 className="text-[2rem] font-extrabold tracking-tighter text-primary sm:text-4xl lg:pb-2">
+                <h2 className="text-[2rem] font-extrabold tracking-tighter text-primary sm:text-4xl lg:pb-2 shrink-0">
                   Your Active Bonds
                 </h2>
-                <div className="flex flex-col gap-3 w-full lg:max-w-[42rem] lg:items-end">
+                <div className="flex flex-col gap-3 w-full lg:w-max lg:max-w-[calc(100vw-3rem)] lg:ml-auto">
                   <form
                     action="/"
                     method="get"
