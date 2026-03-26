@@ -199,8 +199,8 @@ export default async function Home({
             </div>
 
             <section className="space-y-4 sm:space-y-5">
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                <h2 className="text-[2rem] font-extrabold tracking-tighter text-primary sm:text-4xl">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                <h2 className="text-[2rem] font-extrabold tracking-tighter text-primary sm:text-4xl lg:pb-2">
                   Your Active Bonds
                 </h2>
                 <div className="flex flex-col gap-3 w-full lg:max-w-[42rem] lg:items-end">
@@ -239,7 +239,7 @@ export default async function Home({
                       )}
                     </form>
                     <div className="w-full">
-                      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none whitespace-nowrap lg:justify-end">
+                      <div className="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-none whitespace-nowrap lg:w-max lg:ml-auto">
                       {filters.map((item) => {
                       const active = filter === item.key;
                       const href =
@@ -252,7 +252,7 @@ export default async function Home({
                         <Link
                           key={item.key}
                           href={href}
-                          className={`shrink-0 rounded-full border px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.2em] transition sm:px-5 sm:py-2 ${active ? "border-primary bg-primary text-on-primary" : "border-outline-variant/30 bg-white/60 text-on-surface/50 hover:bg-white"}`}
+                          className={`shrink-0 rounded-full border px-3 py-1.5 text-[9px] font-bold uppercase tracking-widest transition sm:px-4 sm:py-1.5 ${active ? "border-primary bg-primary text-on-primary" : "border-outline-variant/30 bg-white/60 text-on-surface/50 hover:bg-white"}`}
                         >
                           {item.label} ({filterCounts[item.key]})
                         </Link>
