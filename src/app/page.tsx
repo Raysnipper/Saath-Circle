@@ -203,7 +203,7 @@ export default async function Home({
                 <h2 className="text-[2rem] font-extrabold tracking-tighter text-primary sm:text-4xl">
                   Your Active Bonds
                 </h2>
-                <div className="flex flex-col gap-3 w-full lg:w-[32rem] lg:items-end">
+                <div className="flex flex-col gap-3 w-full lg:max-w-[42rem] lg:items-end">
                   <form
                     action="/"
                     method="get"
@@ -238,8 +238,9 @@ export default async function Home({
                         </Link>
                       )}
                     </form>
-                    <div className="flex w-full items-center gap-2 overflow-x-auto pb-2 scrollbar-none whitespace-nowrap lg:justify-end">
-                    {filters.map((item) => {
+                    <div className="w-full">
+                      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none whitespace-nowrap lg:justify-end">
+                      {filters.map((item) => {
                       const active = filter === item.key;
                       const href =
                         item.key === "all"
@@ -257,9 +258,10 @@ export default async function Home({
                         </Link>
                       );
                     })}
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
 
               {visibleLoans.length === 0 ? (
                 <div className="dashboard-card border border-dashed border-primary/20 bg-white/20 px-6 py-16 text-center">

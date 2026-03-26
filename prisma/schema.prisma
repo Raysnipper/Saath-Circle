@@ -62,6 +62,7 @@ model Loan {
   createdAt      DateTime  @default(now())
   acknowledgedAt DateTime?
   completedAt    DateTime?
+  lastNudgedAt   DateTime?
   status         String    @default("PENDING") // PENDING, ACTIVE, COMPLETED, REJECTED
 
   lenderId String

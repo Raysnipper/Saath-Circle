@@ -27,17 +27,30 @@ export function NudgeDialog({
 
   const handleNudge = async () => {
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    
-    localStorage.setItem(`saath-nudge-${loanId}`, Date.now().toString());
-    
-    toast.success("Virtual Chai sent!", {
-      description: `We've nudged ${displayName} warmly.`,
-    });
-    
-    setIsLoading(false);
-    setOpen(false);
-    onNudged();
+    try {
+      const res = await fetch(`/api/loans/${loanId}/nudge`, {
+        method: "POST",
+      });
+      
+      if (!res.ok) {
+        throw new Error("Failed to send nudge");
+      }
+      
+      localStorage.setItem(`saath-nudge-${loanId}`, Date.now().toString());
+      
+      toast.success("Virtual Chai sent!", {
+        description: `We've nudged ${displayName} warmly.`,
+      });
+      
+      setOpen(false);
+      onNudged();
+    } catch (e) {
+      toast.error("Failed to brew chai", {
+        description: "Please try again later.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

@@ -35,6 +35,7 @@ type Loan = {
     createdAt: Date;
     reviewedAt?: Date | null;
   }[];
+  lastNudgedAt?: Date | null;
 };
 
 function formatCurrency(amount: number) {
@@ -145,14 +146,20 @@ export function LoanCard({
   const [isNudged, setIsNudged] = useState(false);
 
   useEffect(() => {
-    const lastNudged = localStorage.getItem(`saath-nudge-${loan.id}`);
-    if (lastNudged) {
-      const hoursPassed = (Date.now() - parseInt(lastNudged)) / (1000 * 60 * 60);
+    let nudgedAtTime = loan.lastNudgedAt ? new Date(loan.lastNudgedAt).getTime() : 0;
+    const localFallback = localStorage.getItem(`saath-nudge-${loan.id}`);
+    
+    if (localFallback) {
+      nudgedAtTime = Math.max(nudgedAtTime, parseInt(localFallback));
+    }
+    
+    if (nudgedAtTime > 0) {
+      const hoursPassed = (Date.now() - nudgedAtTime) / (1000 * 60 * 60);
       if (hoursPassed < 24) {
         setIsNudged(true);
       }
     }
-  }, [loan.id]);
+  }, [loan.id, loan.lastNudgedAt]);
 
   return (
     <Card

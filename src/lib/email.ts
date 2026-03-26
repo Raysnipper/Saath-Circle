@@ -232,6 +232,55 @@ export async function sendLenderRepaymentNotification({
             Review Repayment
           </a>
         </p>
+        </p>
+      </div>
+    `,
+  });
+}
+
+export type NudgeNotificationInput = {
+  receiverEmail: string;
+  receiverName?: string | null;
+  senderName?: string | null;
+  senderEmail?: string | null;
+  loanId: string;
+  loanTitle?: string | null;
+  amount: number;
+};
+
+export async function sendNudgeNotification({
+  receiverEmail,
+  receiverName,
+  senderName,
+  senderEmail,
+  amount,
+  loanTitle,
+}: NudgeNotificationInput): Promise<EmailResult> {
+  const baseUrl = getBaseUrl();
+  const receiverDisplay = receiverName ? capitalizeName(receiverName) : receiverEmail;
+  const senderDisplay = senderName ? capitalizeName(senderName) : senderEmail || "Someone";
+
+  return sendEmail({
+    to: receiverEmail,
+    subject: `☕ ${senderDisplay} sent you a virtual chai on Saath Circle`,
+    text: [
+      `Hi ${receiverDisplay},`,
+      "",
+      `${senderDisplay} just nudged you regarding the handshake for INR ${amount.toFixed(2)}${loanTitle ? ` (${loanTitle})` : ""}.`,
+      "Head over to Saath Circle to review your active bonds.",
+      "",
+      `Open this link: ${baseUrl}`,
+    ].join("\n"),
+    html: `
+      <div style="font-family: Georgia, serif; line-height: 1.6; color: #1f1f1f;">
+        <p>Hi ${receiverDisplay},</p>
+        <p>☕ <strong>${senderDisplay}</strong> sent you a virtual chai regarding your active bond for <strong>INR ${amount.toFixed(2)}</strong>${loanTitle ? ` (${loanTitle})` : ""}.</p>
+        <p>Head over to Saath Circle to review your active bonds.</p>
+        <p>
+          <a href="${baseUrl}" style="display:inline-block;padding:12px 18px;background:#111;color:#fff;text-decoration:none;border-radius:999px;">
+            Open Saath Circle
+          </a>
+        </p>
       </div>
     `,
   });
