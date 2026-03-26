@@ -199,17 +199,16 @@ export default async function Home({
             </div>
 
             <section className="space-y-4 sm:space-y-5">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                 <h2 className="text-[2rem] font-extrabold tracking-tighter text-primary sm:text-4xl">
                   Your Active Bonds
                 </h2>
-                <div className="flex flex-col gap-1.5 lg:w-[41rem] lg:items-end">
-                  <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto pb-2 scrollbar-none whitespace-nowrap w-full">
-                    <form
-                      action="/"
-                      method="get"
-                      className="flex w-full flex-wrap gap-2 sm:flex-nowrap"
-                    >
+                <div className="flex flex-col gap-3 w-full lg:w-[32rem] lg:items-end">
+                  <form
+                    action="/"
+                    method="get"
+                    className="flex w-full flex-wrap gap-2 sm:flex-nowrap"
+                  >
                       {filter !== "all" && (
                         <input type="hidden" name="filter" value={filter} />
                       )}
@@ -239,7 +238,7 @@ export default async function Home({
                         </Link>
                       )}
                     </form>
-                    <div className="-mx-1 flex flex-nowrap justify-start gap-2 overflow-x-auto px-1 pb-1 sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 sm:pb-0">
+                    <div className="flex w-full items-center gap-2 overflow-x-auto pb-2 scrollbar-none whitespace-nowrap lg:justify-end">
                     {filters.map((item) => {
                       const active = filter === item.key;
                       const href =
@@ -261,7 +260,6 @@ export default async function Home({
                   </div>
                 </div>
               </div>
-            </div>
 
               {visibleLoans.length === 0 ? (
                 <div className="dashboard-card border border-dashed border-primary/20 bg-white/20 px-6 py-16 text-center">

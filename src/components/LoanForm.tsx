@@ -78,7 +78,7 @@ export function LoanForm() {
       <DialogContent className="sm:max-w-[470px] dashboard-card border-none">
         <DialogHeader>
           <DialogTitle className="font-extrabold tracking-tighter text-3xl text-primary">
-            Add a shared record
+            Start a Handshake
           </DialogTitle>
           <DialogDescription>
             Keep the context clear so the right person can review it without any
@@ -87,7 +87,7 @@ export function LoanForm() {
         </DialogHeader>
         <form onSubmit={onSubmit} className="space-y-4 pt-4">
           <div className="space-y-2">
-            <Label htmlFor="borrowerEmail">Person&apos;s Email</Label>
+            <Label htmlFor="borrowerEmail" className="font-bold text-primary">Who is your Saath?</Label>
             <Input
               id="borrowerEmail"
               name="borrowerEmail"
@@ -97,7 +97,7 @@ export function LoanForm() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="amount">Amount (INR)</Label>
+            <Label htmlFor="amount" className="font-bold text-primary">Amount of Support</Label>
             <Input
               id="amount"
               name="amount"
@@ -108,7 +108,7 @@ export function LoanForm() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="title">Context (Optional)</Label>
+            <Label htmlFor="title" className="font-bold text-primary">The Story</Label>
             <Input
               id="title"
               name="title"
@@ -117,8 +117,8 @@ export function LoanForm() {
             />
           </div>
           <div className="flex justify-end pt-4">
-            <Button type="submit" disabled={loading}>
-              {loading ? "Saving..." : "Save Record"}
+            <Button type="submit" disabled={loading} className="bg-primary hover:bg-primary/90 text-on-primary font-bold tracking-widest uppercase text-xs rounded-full px-8">
+              {loading ? "Saving..." : "Initiate Handshake"}
             </Button>
           </div>
         </form>

@@ -1,6 +1,9 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { Coffee } from "lucide-react";
+import { NudgeDialog } from "@/components/NudgeDialog";
 import { AcknowledgeLoanButton } from "@/components/AcknowledgeLoanButton";
 import { RepaymentDialog } from "@/components/RepaymentDialog";
 import { TransactionReviewActions } from "@/components/TransactionReviewActions";
@@ -139,6 +142,18 @@ export function LoanCard({
   const ageLabel = `${daysOpen} day${daysOpen === 1 ? "" : "s"}`;
   const lastActivity = getLastActivity(loan);
 
+  const [isNudged, setIsNudged] = useState(false);
+
+  useEffect(() => {
+    const lastNudged = localStorage.getItem(`saath-nudge-${loan.id}`);
+    if (lastNudged) {
+      const hoursPassed = (Date.now() - parseInt(lastNudged)) / (1000 * 60 * 60);
+      if (hoursPassed < 24) {
+        setIsNudged(true);
+      }
+    }
+  }, [loan.id]);
+
   return (
     <Card
       size="sm"
@@ -172,12 +187,31 @@ export function LoanCard({
                     </div>
                   )}
                 </div>
-                <Badge
-                  variant="outline"
-                  className={`${statusTone(loan.status)} shrink-0 rounded-full px-2 py-0.5 text-[0.58rem] font-bold tracking-[0.13em] shadow-none sm:px-2.5 sm:py-1 sm:text-[0.63rem] uppercase`}
-                >
-                  {loan.status === 'PENDING' ? 'Awaiting Handshake' : loan.status === 'ACTIVE' ? 'In Progress' : loan.status === 'COMPLETED' ? 'Settled with Grace' : loan.status}
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Badge
+                    variant="outline"
+                    className={`${statusTone(loan.status)} shrink-0 rounded-full px-2 py-0.5 text-[0.58rem] font-bold tracking-[0.13em] shadow-none sm:px-2.5 sm:py-1 sm:text-[0.63rem] uppercase`}
+                  >
+                    {loan.status === 'PENDING' ? 'Awaiting Handshake' : loan.status === 'ACTIVE' ? 'In Progress' : loan.status === 'COMPLETED' ? 'Settled with Grace' : loan.status}
+                  </Badge>
+                  {loan.status === 'ACTIVE' && (
+                    <NudgeDialog
+                      loanId={loan.id}
+                      counterpartName={counterpartName}
+                      onNudged={() => setIsNudged(true)}
+                    >
+                      <button className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#fdf5ed] border border-[#f5eadf] text-[#2F1400] hover:bg-[#f5e6d8] transition-colors cursor-pointer group relative shadow-sm">
+                        <Coffee className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-colors ${isNudged ? "text-[#E07A5F] fill-[#E07A5F]/20 animate-pulse" : ""}`} strokeWidth={2.5} />
+                        {isNudged && (
+                          <span className="absolute top-0 right-0 flex h-2 w-2">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#E07A5F] opacity-75 mt-0.5 mr-0.5"></span>
+                            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#E07A5F] mt-0.5 mr-0.5"></span>
+                          </span>
+                        )}
+                      </button>
+                    </NudgeDialog>
+                  )}
+                </div>
               </div>
 
               <div className="mt-2 flex items-end justify-between gap-2">
