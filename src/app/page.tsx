@@ -134,10 +134,10 @@ export default async function Home({
   const netBalance = owedToYou - youOwe;
 
   const filters = [
-    { key: "all", label: "All" },
-    { key: "needs-action", label: "Needs Action" },
-    { key: "active", label: "Active" },
-    { key: "completed", label: "Completed" },
+    { key: "all", label: "All Bonds" },
+    { key: "needs-action", label: "Pending Handshake" },
+    { key: "active", label: "Ongoing Support" },
+    { key: "completed", label: "Settled Stories" },
   ] as const;
   const filterCounts = {
     all: userLoans.length,
@@ -160,10 +160,10 @@ export default async function Home({
             <header className="dashboard-card grid gap-3 p-4 sm:p-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-end">
               <div className="space-y-2">
                 <h1 className="text-[2.8rem] tracking-tighter font-extrabold leading-none text-primary sm:text-5xl lg:text-[3.5rem]">
-                  Money Between People
+                  Our Shared Bonds
                 </h1>
                 <p className="max-w-xl text-sm font-medium leading-5 text-on-surface/60 sm:text-base sm:leading-6">
-                  Stay clear on who owes what, without awkward reminders.
+                  A private, trusted record of helping hands between you and your circle.
                 </p>
               </div>
               <div className="flex justify-start md:justify-end">
@@ -172,31 +172,35 @@ export default async function Home({
             </header>
 
             <div className="grid gap-2.5 grid-cols-2 sm:grid-cols-3 sm:gap-4">
-              <div className="dashboard-card col-span-2 p-4 sm:col-span-1 sm:p-5">
-                <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-on-surface/40">
-                  Net Balance
+              <div className="dashboard-card col-span-2 p-4 sm:col-span-1 sm:p-5 flex flex-col items-center justify-center text-center">
+                <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-on-surface/40 mb-3">
+                  The Mutual Standing
                 </p>
                 <div
-                  className={`mt-2.5 font-sans text-[1.85rem] font-bold leading-none tracking-tight tabular-nums sm:mt-3 sm:text-[2.3rem] ${netBalance > 0 ? "text-emerald-600" : netBalance < 0 ? "text-rose-500" : "text-foreground"}`}
+                  className={`relative flex items-center justify-center w-[6rem] h-[6rem] sm:w-[7rem] sm:h-[7rem] rounded-full border-[6px] transition-all duration-500 shadow-xl ${netBalance > 0 ? "border-[#84A98C] shadow-[#84A98C]/30 bg-[#84A98C]/5" : netBalance < 0 ? "border-[#E07A5F] shadow-[#E07A5F]/30 bg-[#E07A5F]/5" : "border-outline-variant/30 bg-surface"}`}
                 >
-                  {"\u20B9"}
-                  {netBalance.toFixed(2)}
+                  <div
+                    className={`font-sans text-[1.2rem] sm:text-[1.5rem] font-bold leading-none tracking-tight tabular-nums ${netBalance > 0 ? "text-[#84A98C]" : netBalance < 0 ? "text-[#E07A5F]" : "text-primary"}`}
+                  >
+                    {"\u20B9"}
+                    {Math.abs(netBalance).toFixed(2)}
+                  </div>
                 </div>
               </div>
-              <div className="dashboard-card p-4 sm:p-5">
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface/40">
-                  Owed To You
+              <div className="dashboard-card p-4 sm:p-5 flex flex-col items-center justify-center text-center">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface/40 mb-3">
+                  Support Extended
                 </p>
-                <div className="mt-2.5 font-sans text-[1.75rem] font-bold leading-none tracking-tight tabular-nums text-emerald-600 sm:mt-3 sm:text-[2.3rem]">
+                <div className="font-sans text-[1.45rem] font-bold leading-none tracking-tight tabular-nums text-emerald-600 sm:text-[2rem]">
                   {"\u20B9"}
                   {owedToYou.toFixed(2)}
                 </div>
               </div>
-              <div className="dashboard-card p-4 sm:p-5">
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface/40">
-                  You Owe
+              <div className="dashboard-card p-4 sm:p-5 flex flex-col items-center justify-center text-center">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface/40 mb-3">
+                  Support Received
                 </p>
-                <div className="mt-2.5 font-sans text-[1.75rem] font-bold leading-none tracking-tight tabular-nums text-rose-500 sm:mt-3 sm:text-[2.3rem]">
+                <div className="font-sans text-[1.45rem] font-bold leading-none tracking-tight tabular-nums text-rose-500 sm:text-[2rem]">
                   {"\u20B9"}
                   {youOwe.toFixed(2)}
                 </div>
@@ -228,7 +232,7 @@ export default async function Home({
                         name="q"
                         type="search"
                         defaultValue={query}
-                        placeholder="Search by person or title"
+                        placeholder="Find a person or a promise..."
                         className="h-9 min-w-0 basis-full flex-1 rounded-full border border-outline-variant/30 bg-white/70 px-4 text-[0.74rem] text-primary outline-none transition placeholder:text-on-surface/40 focus:border-primary/30 focus:ring-2 focus:ring-primary/20 sm:h-10 sm:min-w-[18rem] sm:basis-auto sm:text-[0.8rem]"
                       />
                       <button

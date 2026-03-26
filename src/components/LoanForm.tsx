@@ -73,7 +73,7 @@ export function LoanForm() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger className="bg-primary text-on-primary px-6 py-3 sm:py-2.5 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-widest hover:scale-105 hover:bg-primary-container hover:text-primary hover:shadow-md transition-all flex items-center gap-2">
-        <Plus className="h-4 w-4" strokeWidth={3} /> ADD RECORD
+        <Plus className="h-4 w-4" strokeWidth={3} /> START A HANDSHAKE
       </DialogTrigger>
       <DialogContent className="sm:max-w-[470px] dashboard-card border-none">
         <DialogHeader>

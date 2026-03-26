@@ -174,9 +174,9 @@ export function LoanCard({
                 </div>
                 <Badge
                   variant="outline"
-                  className={`${statusTone(loan.status)} shrink-0 rounded-full px-2 py-0.5 text-[0.58rem] tracking-[0.13em] shadow-none sm:px-2.5 sm:py-1 sm:text-[0.63rem]`}
+                  className={`${statusTone(loan.status)} shrink-0 rounded-full px-2 py-0.5 text-[0.58rem] font-bold tracking-[0.13em] shadow-none sm:px-2.5 sm:py-1 sm:text-[0.63rem] uppercase`}
                 >
-                  {loan.status}
+                  {loan.status === 'PENDING' ? 'Awaiting Handshake' : loan.status === 'ACTIVE' ? 'In Progress' : loan.status === 'COMPLETED' ? 'Settled with Grace' : loan.status}
                 </Badge>
               </div>
 
@@ -247,24 +247,24 @@ export function LoanCard({
         >
           <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
             <div>
-              <div className={`text-[0.58rem] uppercase tracking-[0.14em] ${isCompleted ? "text-stone-500" : "text-muted-foreground"}`}>
-                Total
+              <div className={`text-[0.58rem] font-bold uppercase tracking-[0.14em] ${isCompleted ? "text-stone-500" : "text-muted-foreground"}`}>
+                The Support
               </div>
               <div className={`mt-1 text-[0.95rem] font-semibold sm:mt-1.5 sm:text-lg ${isCompleted ? "text-stone-700" : ""}`}>
                 {formatCurrency(loan.amount)}
               </div>
             </div>
             <div>
-              <div className={`text-[0.58rem] uppercase tracking-[0.14em] ${isCompleted ? "text-stone-500" : "text-muted-foreground"}`}>
-                Repaid
+              <div className={`text-[0.58rem] font-bold uppercase tracking-[0.14em] ${isCompleted ? "text-stone-500" : "text-muted-foreground"}`}>
+                Flowed Back
               </div>
               <div className={`mt-1 text-[0.95rem] font-semibold sm:mt-1.5 sm:text-lg ${isCompleted ? "text-stone-700" : "text-emerald-600"}`}>
                 {formatCurrency(confirmedPayments)}
               </div>
             </div>
             <div>
-              <div className={`text-[0.58rem] uppercase tracking-[0.14em] ${isCompleted ? "text-stone-500" : "text-muted-foreground"}`}>
-                Open
+              <div className={`text-[0.58rem] font-bold uppercase tracking-[0.14em] ${isCompleted ? "text-stone-500" : "text-muted-foreground"}`}>
+                Remaining
               </div>
               <div className={`mt-1 text-[0.95rem] font-semibold sm:mt-1.5 sm:text-lg ${isCompleted ? "text-stone-600" : ""}`}>
                 {formatCurrency(outstanding)}
