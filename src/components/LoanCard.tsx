@@ -191,10 +191,10 @@ export function LoanCard({
                 </div>
 
                 <div
-                  className={`flex min-w-[78px] flex-col items-center justify-center rounded-[1rem] border px-2 py-1 text-[0.55rem] font-semibold uppercase leading-tight tracking-[0.13em] sm:min-w-[92px] sm:rounded-[1.1rem] sm:text-[0.58rem] ${isCompleted ? "border-stone-300 bg-stone-100 text-stone-700" : palette.chip}`}
+                  className={`flex min-w-[78px] flex-col items-center justify-center rounded-[1rem] border px-2 py-1 text-[0.55rem] font-semibold uppercase leading-tight tracking-[0.13em] sm:min-w-[92px] sm:rounded-[1.1rem] sm:text-[0.58rem] text-center ${isCompleted ? "border-stone-300 bg-stone-100 text-stone-700" : palette.chip}`}
                 >
-                  <span>You</span>
-                  <span>{isLender ? "Received" : "Owe"}</span>
+                  <span>{isLender ? "EXTENDED" : "RECEIVED"}</span>
+                  <span>SUPPORT</span>
                 </div>
               </div>
             </div>

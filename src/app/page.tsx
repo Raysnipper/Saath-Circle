@@ -172,50 +172,39 @@ export default async function Home({
             </header>
 
             <div className="grid gap-2.5 grid-cols-2 sm:grid-cols-3 sm:gap-4">
-              <div className="dashboard-card col-span-2 p-4 sm:col-span-1 sm:p-5 flex flex-col items-center justify-center text-center">
-                <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-on-surface/40 mb-3">
+              <div className="dashboard-card col-span-2 p-6 sm:col-span-1 sm:p-8 flex flex-col items-center justify-center text-center">
+                <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-on-surface/40 mb-4 sm:mb-5">
                   The Mutual Standing
                 </p>
-                <div
-                  className={`relative flex items-center justify-center w-[6rem] h-[6rem] sm:w-[7rem] sm:h-[7rem] rounded-full border-[6px] transition-all duration-500 shadow-xl ${netBalance > 0 ? "border-[#84A98C] shadow-[#84A98C]/30 bg-[#84A98C]/5" : netBalance < 0 ? "border-[#E07A5F] shadow-[#E07A5F]/30 bg-[#E07A5F]/5" : "border-outline-variant/30 bg-surface"}`}
-                >
-                  <div
-                    className={`font-sans text-[1.2rem] sm:text-[1.5rem] font-bold leading-none tracking-tight tabular-nums ${netBalance > 0 ? "text-[#84A98C]" : netBalance < 0 ? "text-[#E07A5F]" : "text-primary"}`}
-                  >
-                    {"\u20B9"}
-                    {Math.abs(netBalance).toFixed(2)}
-                  </div>
+                <div className={`font-sans text-[2.2rem] sm:text-[2.8rem] font-bold leading-none tracking-tight tabular-nums ${netBalance > 0 ? "text-[#84A98C]" : netBalance < 0 ? "text-[#E07A5F]" : "text-primary"}`}>
+                  {"\u20B9"}{Math.abs(netBalance).toFixed(2)}
                 </div>
               </div>
-              <div className="dashboard-card p-4 sm:p-5 flex flex-col items-center justify-center text-center">
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface/40 mb-3">
+              <div className="dashboard-card p-6 sm:p-8 flex flex-col items-center justify-center text-center">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface/40 mb-4 sm:mb-5">
                   Support Extended
                 </p>
-                <div className="font-sans text-[1.45rem] font-bold leading-none tracking-tight tabular-nums text-emerald-600 sm:text-[2rem]">
-                  {"\u20B9"}
-                  {owedToYou.toFixed(2)}
+                <div className="font-sans text-[2.2rem] sm:text-[2.8rem] font-bold leading-none tracking-tight tabular-nums text-[#84A98C]">
+                  {"\u20B9"}{owedToYou.toFixed(2)}
                 </div>
               </div>
-              <div className="dashboard-card p-4 sm:p-5 flex flex-col items-center justify-center text-center">
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface/40 mb-3">
+              <div className="dashboard-card p-6 sm:p-8 flex flex-col items-center justify-center text-center">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface/40 mb-4 sm:mb-5">
                   Support Received
                 </p>
-                <div className="font-sans text-[1.45rem] font-bold leading-none tracking-tight tabular-nums text-rose-500 sm:text-[2rem]">
-                  {"\u20B9"}
-                  {youOwe.toFixed(2)}
+                <div className="font-sans text-[2.2rem] sm:text-[2.8rem] font-bold leading-none tracking-tight tabular-nums text-[#E07A5F]">
+                  {"\u20B9"}{youOwe.toFixed(2)}
                 </div>
               </div>
             </div>
 
             <section className="space-y-4 sm:space-y-5">
-              <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-                <div>
-                  <h2 className="text-[2.2rem] font-extrabold tracking-tighter text-primary leading-none sm:text-[2.25rem]">
-                    Your Records
-                  </h2>
-                </div>
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <h2 className="text-[2rem] font-extrabold tracking-tighter text-primary sm:text-4xl">
+                  Your Active Bonds
+                </h2>
                 <div className="flex flex-col gap-1.5 lg:w-[41rem] lg:items-end">
-                  <div className="flex flex-col gap-2 w-full lg:w-fit">
+                  <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto pb-2 scrollbar-none whitespace-nowrap w-full">
                     <form
                       action="/"
                       method="get"

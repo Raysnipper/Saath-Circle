@@ -69,7 +69,7 @@ export function RepaymentDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger render={<Button size="sm" variant="outline" className="w-full" />}>
-        Record Repayment
+        Update Flow Back
       </DialogTrigger>
       <DialogContent className="sm:max-w-[440px] border-white/70 bg-background/95 shadow-2xl">
         <DialogHeader>
