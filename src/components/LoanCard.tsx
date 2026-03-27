@@ -209,7 +209,7 @@ export function LoanCard({
                       <span>Settled<br />w/ Grace</span>
                     ) : loan.status}
                   </Badge>
-                  {loan.status === 'ACTIVE' && (
+                  {(loan.status === 'ACTIVE' || loan.status === 'PENDING') && (
                     <NudgeDialog
                       loanId={loan.id}
                       counterpartName={counterpartName}
