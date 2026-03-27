@@ -306,7 +306,7 @@ export function LoanCard({
                 {formatCurrency(loan.amount)}
               </div>
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 text-center">
               <div className={`truncate text-[0.58rem] font-bold uppercase tracking-[0.14em] ${isCompleted ? "text-stone-500" : "text-muted-foreground"}`}>
                 Flowed Back
               </div>
@@ -314,7 +314,7 @@ export function LoanCard({
                 {formatCurrency(confirmedPayments)}
               </div>
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 text-right">
               <div className={`truncate text-[0.58rem] font-bold uppercase tracking-[0.14em] ${isCompleted ? "text-stone-500" : "text-muted-foreground"}`}>
                 Remaining
               </div>
