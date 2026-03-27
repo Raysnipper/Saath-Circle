@@ -39,7 +39,11 @@ type Loan = {
 };
 
 function formatCurrency(amount: number) {
-  return `\u20B9${amount.toFixed(2)}`;
+  const formatted = new Intl.NumberFormat('en-IN', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount);
+  return `\u20B9${formatted}`;
 }
 
 function toDisplayName(name?: string | null, email?: string | null) {
@@ -197,9 +201,13 @@ export function LoanCard({
                 <div className="flex items-center gap-2">
                   <Badge
                     variant="outline"
-                    className={`${statusTone(loan.status)} shrink-0 rounded-full px-2 py-0.5 text-[0.58rem] font-bold tracking-[0.13em] shadow-none sm:px-2.5 sm:py-1 sm:text-[0.63rem] uppercase`}
+                    className={`${statusTone(loan.status)} shrink-0 rounded-[0.5rem] px-2 py-1 text-[0.5rem] font-bold tracking-[0.1em] shadow-none sm:px-2.5 sm:py-1.5 sm:text-[0.55rem] uppercase text-center leading-[1.15]`}
                   >
-                    {loan.status === 'PENDING' ? 'Awaiting Handshake' : loan.status === 'ACTIVE' ? 'In Progress' : loan.status === 'COMPLETED' ? 'Settled with Grace' : loan.status}
+                    {loan.status === 'PENDING' ? (
+                      <span>Awaiting<br />Handshake</span>
+                    ) : loan.status === 'ACTIVE' ? 'In Progress' : loan.status === 'COMPLETED' ? (
+                      <span>Settled<br />w/ Grace</span>
+                    ) : loan.status}
                   </Badge>
                   {loan.status === 'ACTIVE' && (
                     <NudgeDialog
@@ -223,7 +231,10 @@ export function LoanCard({
 
               <div className="mt-2 flex items-end justify-between gap-2">
                 <div className="min-w-0">
-                  <div className={`text-[1.45rem] font-bold leading-none tracking-tight sm:text-[2rem] ${isCompleted ? "text-stone-700" : "text-foreground"}`}>
+                  <div 
+                    className={`truncate text-[1.45rem] font-bold leading-none tracking-tight sm:text-[2rem] ${isCompleted ? "text-stone-700" : "text-foreground"}`}
+                    title={formatCurrency(outstanding)}
+                  >
                     {formatCurrency(outstanding)}
                   </div>
                   <p className={`mt-1 text-[0.68rem] sm:text-xs ${isCompleted ? "text-stone-500" : "text-muted-foreground"}`}>
@@ -287,27 +298,27 @@ export function LoanCard({
           className={`rounded-[1.1rem] border px-2.5 py-2 sm:rounded-[1.35rem] sm:p-3 ${isCompleted ? "border-stone-200 bg-stone-100/50" : "border-white/60 bg-background/65"}`}
         >
           <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
-            <div>
-              <div className={`text-[0.58rem] font-bold uppercase tracking-[0.14em] ${isCompleted ? "text-stone-500" : "text-muted-foreground"}`}>
+            <div className="min-w-0">
+              <div className={`truncate text-[0.58rem] font-bold uppercase tracking-[0.14em] ${isCompleted ? "text-stone-500" : "text-muted-foreground"}`}>
                 The Support
               </div>
-              <div className={`mt-1 text-[0.95rem] font-semibold sm:mt-1.5 sm:text-lg ${isCompleted ? "text-stone-700" : ""}`}>
+              <div className={`mt-1 truncate text-[0.95rem] font-semibold sm:mt-1.5 sm:text-lg ${isCompleted ? "text-stone-700" : ""}`} title={formatCurrency(loan.amount)}>
                 {formatCurrency(loan.amount)}
               </div>
             </div>
-            <div>
-              <div className={`text-[0.58rem] font-bold uppercase tracking-[0.14em] ${isCompleted ? "text-stone-500" : "text-muted-foreground"}`}>
+            <div className="min-w-0">
+              <div className={`truncate text-[0.58rem] font-bold uppercase tracking-[0.14em] ${isCompleted ? "text-stone-500" : "text-muted-foreground"}`}>
                 Flowed Back
               </div>
-              <div className={`mt-1 text-[0.95rem] font-semibold sm:mt-1.5 sm:text-lg ${isCompleted ? "text-stone-700" : "text-emerald-600"}`}>
+              <div className={`mt-1 truncate text-[0.95rem] font-semibold sm:mt-1.5 sm:text-lg ${isCompleted ? "text-stone-700" : "text-emerald-600"}`} title={formatCurrency(confirmedPayments)}>
                 {formatCurrency(confirmedPayments)}
               </div>
             </div>
-            <div>
-              <div className={`text-[0.58rem] font-bold uppercase tracking-[0.14em] ${isCompleted ? "text-stone-500" : "text-muted-foreground"}`}>
+            <div className="min-w-0">
+              <div className={`truncate text-[0.58rem] font-bold uppercase tracking-[0.14em] ${isCompleted ? "text-stone-500" : "text-muted-foreground"}`}>
                 Remaining
               </div>
-              <div className={`mt-1 text-[0.95rem] font-semibold sm:mt-1.5 sm:text-lg ${isCompleted ? "text-stone-600" : ""}`}>
+              <div className={`mt-1 truncate text-[0.95rem] font-semibold sm:mt-1.5 sm:text-lg ${isCompleted ? "text-stone-600" : ""}`} title={formatCurrency(outstanding)}>
                 {formatCurrency(outstanding)}
               </div>
             </div>

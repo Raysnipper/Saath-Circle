@@ -1,40 +1,31 @@
-# Next Session Todo
+# Next Session Todo (Saath Circle)
 
-## Current Status (V1 Shipped & Polished)
-- **Successfully deployed the V1 production app to Vercel!**
-- Connected to live production Neon database and pushed Prisma schema.
-- **UI & UX Polish Completed Today:**
-  - Upgraded the unauthenticated landing page to modern 2026 design standards.
-  - Implemented dynamic entrance and breathing glow animations using `framer-motion`.
-  - Removed redundant "SAATH CIRCLE" branding and recentered landing page items.
-  - Fixed the dashboard search bar width so it perfectly left-aligns with the filter pills on desktop.
-- **Email Refinements:**
-  - Standardized the app name to "Saath Circle" across all email templates and subjects.
-  - Added a helper function to automatically Title Case names (e.g., "Dilip Mistry") in all outgoing emails.
-- **Smoke Testing:**
-  - Successfully ran full production smoke tests.
-  - Cleaned up dummy testing data directly via the live Neon SQL Editor.
+## ✅ Current Status & Achieved Today
+- **Virtual Chai / Nudge Feature:**
+  - Built full-stack Nudge functionality (API route, front-end Dialog).
+  - Designed custom HTML email notification via Nodemailer and styled "Virtual Chai" theme.
+  - Added `lastNudgedAt` to the `Loan` database schema to persist a 24-hour pulsing/glowing Chai icon state.
+- **Dashboard Layout & Polish (2026 Theme):**
+  - Updated terminology ("Start a Handshake", "Support Extended", "Support Received", "Your Active Bonds").
+  - Restructured the Search Bar and Filter Tabs into a smart, responsive layout (perfect left-edge alignment to handle varying device sizes).
+  - Refined hover states for "Sign Out" to exactly match the deep brown secondary buttons.
+- **Infrastructure:**
+  - Diagnosed and fixed the Vercel 500 server exception by adding `prisma db push` to the build script to easily automate schema changes on Neon.
+  - Wiped dummy data in the live Neon DB to reset the app state.
 
-## Highest Priority Next
-- Continue monitoring the V1 production release!
-- Make any necessary hotfixes or layout tweaks based on initial live usage.
-- The app is currently fully functional for users to create, acknowledge, and settle shared balances.
+## ⏳ Highest Priority Next / Open Items
+1. **Relationship Summary - The "Circle Visualizer"**
+   - *Requirement:* Implement a soft, glowing ring graphic in the dashboard stats section that shifts color (Sage Green to Terracotta) based on which way the support is flowing (Net Balance).
+2. **Contact Us Page**
+   - *Requirement:* Create a dummy "Contact Us" page that says Under Construction or something graceful.
+3. **Production Validation**
+   - Final end-to-end verification of the Nodemailer SMTP live in Vercel.
 
-## Nice To Revisit After V1 (Fast Follows)
-- Filter chip counter styling polish.
-- Subtle tinted summary cards.
-- Stronger completed/archive dashboard treatment.
-- In-app push notifications.
+## Nice To Revisit After V1
 - Notification preferences toggle.
 - Categories/notes on transactions.
 - Export/shareable CSV summaries.
 
 ## Important Context
 - Remember that `npx prisma studio` connects to whatever database is in your local `.env`. 
-- To delete records or manipulate live data safely, either use `npx prisma studio` pointed at the production variable, or run direct queries in the Neon Tech SQL Editor.
-
-## Retrieval
-- Reopen this file next session:
-  - `NEXT_SESSION_TODO.md`
-- Or simply ask:
-  - `What should we work on next?`
+- Vercel deployments will now automatically apply Prisma Schema changes during `npm run build`.
