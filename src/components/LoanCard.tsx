@@ -40,8 +40,8 @@ type Loan = {
 
 function formatCurrency(amount: number) {
   const formatted = new Intl.NumberFormat('en-IN', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
   }).format(amount);
   return `\u20B9${formatted}`;
 }
@@ -198,7 +198,7 @@ export function LoanCard({
                     </div>
                   )}
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 shrink-0">
                   <Badge
                     variant="outline"
                     className={`${statusTone(loan.status)} shrink-0 rounded-[0.5rem] px-2 py-1 text-[0.5rem] font-bold tracking-[0.1em] shadow-none sm:px-2.5 sm:py-1.5 sm:text-[0.55rem] uppercase text-center leading-[1.15]`}
@@ -243,7 +243,7 @@ export function LoanCard({
                 </div>
 
                 <div
-                  className={`flex min-w-[78px] flex-col items-center justify-center rounded-[1rem] border px-2 py-1 text-[0.55rem] font-semibold uppercase leading-tight tracking-[0.13em] sm:min-w-[92px] sm:rounded-[1.1rem] sm:text-[0.58rem] text-center ${isCompleted ? "border-stone-300 bg-stone-100 text-stone-700" : palette.chip}`}
+                  className={`flex shrink-0 w-max flex-col items-center justify-center rounded-[1rem] border px-2 py-1 text-[0.5rem] font-bold uppercase leading-tight tracking-[0.1em] sm:rounded-[1.1rem] sm:text-[0.55rem] text-center ${isCompleted ? "border-stone-300 bg-stone-100 text-stone-700" : palette.chip}`}
                 >
                   <span>{isLender ? "EXTENDED" : "RECEIVED"}</span>
                   <span>SUPPORT</span>
