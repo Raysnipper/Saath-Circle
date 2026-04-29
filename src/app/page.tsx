@@ -56,8 +56,9 @@ function matchesSearch(loan: LoanWithRelations, query: string) {
 
   const haystack = [
     loan.title,
-    loan.borrower.name,
-    loan.borrower.email,
+    loan.borrower?.name,
+    loan.borrower?.email,
+    loan.borrowerEmail,
     loan.lender.name,
     loan.lender.email,
   ]

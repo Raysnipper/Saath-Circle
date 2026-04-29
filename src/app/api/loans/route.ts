@@ -3,6 +3,12 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendBorrowerLoanNotification } from "@/lib/email";
+import {
+  createInvitationToken,
+  hashInvitationToken,
+  invitationExpiresAt,
+  normalizeEmail,
+} from "@/lib/invitations";
 
 export async function POST(req: Request) {
   try {
@@ -14,34 +20,27 @@ export async function POST(req: Request) {
 
     const body = await req.json();
     const { amount, title, borrowerEmail } = body;
+    const normalizedBorrowerEmail =
+      typeof borrowerEmail === "string" ? normalizeEmail(borrowerEmail) : "";
+    const sessionEmail = session.user.email
+      ? normalizeEmail(session.user.email)
+      : "";
 
     // Optional validation
     if (!amount || amount <= 0) {
       return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
     }
 
-    if (!borrowerEmail || borrowerEmail === session.user.email) {
+    if (!normalizedBorrowerEmail || normalizedBorrowerEmail === sessionEmail) {
       return NextResponse.json({ error: "Invalid borrower email" }, { status: 400 });
     }
 
-    // Attempt to find the borrower user by email
-    // If they aren't registered yet, we could either reject or create a shadow user
-    // For now let's just create a shadow user or require them to register first.
-    // Given the simplicity, requiring registration is safer for MVP.
-    let borrower = await prisma.user.findUnique({
-      where: { email: borrowerEmail },
+    const borrower = await prisma.user.findUnique({
+      where: { email: normalizedBorrowerEmail },
+      include: { accounts: true },
     });
-
-    if (!borrower) {
-      // In a real 2026 app, you might send an email invitation here!
-      // But for our MVP we will create a placeholder user account for them
-      borrower = await prisma.user.create({
-        data: {
-          email: borrowerEmail,
-          name: borrowerEmail.split("@")[0],
-        },
-      });
-    }
+    const registeredBorrowerId = borrower?.accounts.length ? borrower.id : null;
+    const inviteToken = createInvitationToken();
 
     const loan = await prisma.loan.create({
       data: {
@@ -49,16 +48,24 @@ export async function POST(req: Request) {
         title: title || "Personal Loan",
         status: "PENDING", // PENDING ACKNOWLEDGMENT
         lenderId: session.user.id,
-        borrowerId: borrower.id,
+        borrowerId: registeredBorrowerId,
+        borrowerEmail: normalizedBorrowerEmail,
+        invitations: {
+          create: {
+            email: normalizedBorrowerEmail,
+            tokenHash: hashInvitationToken(inviteToken),
+            expiresAt: invitationExpiresAt(),
+          },
+        },
       },
     });
 
     const notification = await sendBorrowerLoanNotification({
-      borrowerEmail: borrower.email || borrowerEmail,
-      borrowerName: borrower.name,
+      borrowerEmail: normalizedBorrowerEmail,
+      borrowerName: borrower?.name,
       lenderName: session.user.name,
       lenderEmail: session.user.email,
-      loanId: loan.id,
+      inviteToken,
       loanTitle: loan.title || "Personal Loan",
       amount: loan.amount,
     });
@@ -87,14 +94,14 @@ export async function GET(req: Request) {
     if (type === "given") {
       const loans = await prisma.loan.findMany({
         where: { lenderId: session.user.id },
-        include: { borrower: true, transactions: true },
+        include: { borrower: true, lender: true, transactions: true },
         orderBy: { createdAt: "desc" },
       });
       return NextResponse.json(loans);
     } else if (type === "received") {
       const loans = await prisma.loan.findMany({
         where: { borrowerId: session.user.id },
-        include: { lender: true, transactions: true },
+        include: { borrower: true, lender: true, transactions: true },
         orderBy: { createdAt: "desc" },
       });
       return NextResponse.json(loans);

@@ -46,8 +46,8 @@ export async function POST(
       ? await sendLenderAcknowledgementNotification({
           lenderEmail: loan.lender.email,
           lenderName: loan.lender.name,
-          borrowerName: loan.borrower.name,
-          borrowerEmail: loan.borrower.email,
+          borrowerName: loan.borrower?.name,
+          borrowerEmail: loan.borrower?.email || loan.borrowerEmail,
           loanId: loan.id,
           loanTitle: loan.title || "Personal Loan",
           amount: loan.amount,

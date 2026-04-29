@@ -134,9 +134,8 @@ export default async function LoanTimeline({
   const isLender = loan.lenderId === session.user.id;
   const roleLabel = isBorrower ? "Borrower View" : "Lender View";
   const lenderName = displayName(loan.lender.name, loan.lender.email);
-  const borrowerName = displayName(loan.borrower.name, loan.borrower.email);
-  const otherPerson = isBorrower ? loan.lender : loan.borrower;
-  const otherPersonName = displayName(otherPerson.name, otherPerson.email);
+  const borrowerName = displayName(loan.borrower?.name, loan.borrower?.email || loan.borrowerEmail);
+  const otherPersonName = isBorrower ? lenderName : borrowerName;
 
   const timelineEvents: TimelineEvent[] = [
     {

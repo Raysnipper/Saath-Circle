@@ -24,9 +24,10 @@ type Loan = {
   acknowledgedAt?: Date | null;
   completedAt?: Date | null;
   lenderId: string;
-  borrowerId: string;
+  borrowerId: string | null;
+  borrowerEmail: string;
   createdAt: Date;
-  borrower: { email: string | null; name: string | null };
+  borrower: { email: string | null; name: string | null } | null;
   lender: { email: string | null; name: string | null };
   transactions: {
     id: string;
@@ -128,8 +129,10 @@ export function LoanCard({
   const isLender = loan.lenderId === currentUserId;
   const isBorrower = loan.borrowerId === currentUserId;
   const isCompleted = loan.status === "COMPLETED";
-  const counterpart = isLender ? loan.borrower : loan.lender;
-  const counterpartName = toDisplayName(counterpart.name, counterpart.email);
+  const borrowerEmail = loan.borrower?.email || loan.borrowerEmail;
+  const borrowerName = toDisplayName(loan.borrower?.name, borrowerEmail);
+  const lenderName = toDisplayName(loan.lender.name, loan.lender.email);
+  const counterpartName = isLender ? borrowerName : lenderName;
   const palette = lenderPalette(counterpartName);
 
   const confirmedPayments = loan.transactions
@@ -402,7 +405,7 @@ export function LoanCard({
         )}
         {loan.status === "PENDING" && isLender && (
           <p className="w-full rounded-[1.1rem] border border-amber-500/15 bg-amber-50/50 px-3 py-2 text-center text-xs text-amber-700 sm:rounded-[1.2rem] sm:py-2.5">
-            Waiting for the other person to review this record.
+            Waiting for {borrowerName} to review this record.
           </p>
         )}
         {loan.status === "ACTIVE" && isBorrower && outstanding > 0 && (

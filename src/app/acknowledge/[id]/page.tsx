@@ -1,11 +1,11 @@
 import { getServerSession } from "next-auth/next";
 import { redirect } from "next/navigation";
-import { BorrowerAccessButton } from "@/components/BorrowerAccessButton";
 import { Nav } from "@/components/Nav";
 import { authOptions } from "@/lib/auth";
+import { normalizeEmail } from "@/lib/invitations";
 import { prisma } from "@/lib/prisma";
 
-export default async function BorrowerAcknowledgeEntry({
+export default async function LegacyBorrowerAcknowledgeEntry({
   params,
 }: {
   params: Promise<{ id: string }>;
@@ -25,9 +25,15 @@ export default async function BorrowerAcknowledgeEntry({
     return <div className="p-8 text-center">Loan not found.</div>;
   }
 
-  if (session?.user?.email === loan.borrower.email) {
+  if (
+    session?.user?.id &&
+    (session.user.id === loan.borrowerId || session.user.id === loan.lenderId)
+  ) {
     redirect(`/loan/${loan.id}`);
   }
+
+  const invitedEmail = normalizeEmail(loan.borrowerEmail || loan.borrower?.email || "");
+  const sessionEmail = session?.user?.email ? normalizeEmail(session.user.email) : null;
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
@@ -36,53 +42,28 @@ export default async function BorrowerAcknowledgeEntry({
         <div className="w-full max-w-2xl rounded-2xl border bg-card p-8 shadow-sm space-y-5">
           <div className="space-y-2">
             <p className="text-sm uppercase tracking-[0.2em] text-muted-foreground">
-              Borrower Access
+              Legacy Invite Link
             </p>
             <h1 className="text-3xl font-bold tracking-tight">
-              Review and acknowledge this loan
+              This invite link needs to be refreshed
             </h1>
             <p className="text-muted-foreground">
-              This invitation is intended for{" "}
-              <span className="font-medium text-foreground">
-                {loan.borrower.email}
-              </span>
-              .
+              This older invitation was intended for{" "}
+              <span className="font-medium text-foreground">{invitedEmail}</span>.
             </p>
           </div>
 
-          <div className="rounded-xl border bg-muted/30 p-5 space-y-2">
-            <p>
-              <span className="font-medium">Lender:</span>{" "}
-              {loan.lender.name || loan.lender.email}
-            </p>
-            <p>
-              <span className="font-medium">Loan:</span>{" "}
-              {loan.title || "Personal Loan"}
-            </p>
-            <p>
-              <span className="font-medium">Amount:</span> ₹{loan.amount.toFixed(2)}
-            </p>
-            <p>
-              <span className="font-medium">Status:</span> {loan.status}
-            </p>
-          </div>
-
-          {session?.user?.email ? (
+          {sessionEmail ? (
             <div className="rounded-xl border border-amber-500/30 bg-amber-50/50 p-4 text-sm">
               You are currently signed in as{" "}
-              <span className="font-medium">{session.user.email}</span>. Continue
-              below to sign out first if this is not the borrower account.
+              <span className="font-medium">{sessionEmail}</span>.
             </div>
-          ) : (
-            <p className="text-sm text-muted-foreground">
-              Continue with the borrower&apos;s Google account to review this loan.
-            </p>
-          )}
+          ) : null}
 
-          <BorrowerAccessButton
-            loanId={loan.id}
-            borrowerEmail={loan.borrower.email || ""}
-          />
+          <p className="text-sm text-muted-foreground">
+            For privacy, loan details are now opened through secure invitation
+            links. Ask the sender to create or resend the handshake invitation.
+          </p>
         </div>
       </main>
     </div>

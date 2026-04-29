@@ -6,7 +6,7 @@ type BorrowerNotificationInput = {
   borrowerName?: string | null;
   lenderName?: string | null;
   lenderEmail?: string | null;
-  loanId: string;
+  inviteToken: string;
   loanTitle: string;
   amount: number;
 };
@@ -127,11 +127,11 @@ export async function sendBorrowerLoanNotification({
   borrowerName,
   lenderName,
   lenderEmail,
-  loanId,
+  inviteToken,
   loanTitle,
   amount,
 }: BorrowerNotificationInput): Promise<EmailResult> {
-  const acknowledgeUrl = `${getBaseUrl()}/acknowledge/${loanId}`;
+  const acknowledgeUrl = `${getBaseUrl()}/invite/${inviteToken}`;
   const borrowerDisplay = borrowerName ? capitalizeName(borrowerName) : borrowerEmail;
   const lenderDisplay = lenderName ? capitalizeName(lenderName) : lenderEmail || "Someone";
 

@@ -43,8 +43,9 @@ model User {
   sessions      Session[]
 
   // Real relations for loans
-  loansGiven    Loan[] @relation("Lender")
-  loansReceived Loan[] @relation("Borrower")
+  loansGiven       Loan[]           @relation("Lender")
+  loansReceived    Loan[]           @relation("Borrower")
+  loanInvitations  LoanInvitation[] @relation("InvitedUser")
 }
 
 model VerificationToken {
@@ -68,10 +69,30 @@ model Loan {
   lenderId String
   lender   User   @relation("Lender", fields: [lenderId], references: [id])
 
-  borrowerId String
-  borrower   User   @relation("Borrower", fields: [borrowerId], references: [id])
+  borrowerId    String?
+  borrower      User?  @relation("Borrower", fields: [borrowerId], references: [id])
+  borrowerEmail String
 
   transactions Transaction[]
+  invitations  LoanInvitation[]
+}
+
+model LoanInvitation {
+  id          String    @id @default(cuid())
+  email       String
+  tokenHash   String    @unique
+  expiresAt   DateTime
+  acceptedAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  loanId String
+  loan   Loan   @relation(fields: [loanId], references: [id], onDelete: Cascade)
+
+  acceptedById String?
+  acceptedBy   User?   @relation("InvitedUser", fields: [acceptedById], references: [id])
+
+  @@index([email])
+  @@index([loanId])
 }
 
 model Transaction {

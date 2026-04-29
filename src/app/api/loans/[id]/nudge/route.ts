@@ -36,8 +36,12 @@ export async function POST(
       return NextResponse.json({ error: "Not authorized to nudge this loan" }, { status: 403 });
     }
 
-    const senderUser = isLender ? loan.lender : loan.borrower;
-    const receiverUser = isLender ? loan.borrower : loan.lender;
+    const senderEmail = isLender ? loan.lender.email : loan.borrower?.email;
+    const senderName = isLender ? loan.lender.name : loan.borrower?.name;
+    const receiverEmail = isLender
+      ? loan.borrower?.email || loan.borrowerEmail
+      : loan.lender.email;
+    const receiverName = isLender ? loan.borrower?.name : loan.lender.name;
 
     const updated = await prisma.loan.update({
       where: { id },
@@ -46,12 +50,12 @@ export async function POST(
       },
     });
 
-    const notification = receiverUser.email
+    const notification = receiverEmail
       ? await sendNudgeNotification({
-          receiverEmail: receiverUser.email,
-          receiverName: receiverUser.name,
-          senderEmail: senderUser.email,
-          senderName: senderUser.name,
+          receiverEmail,
+          receiverName,
+          senderEmail,
+          senderName,
           loanId: loan.id,
           loanTitle: loan.title,
           amount: loan.amount,
