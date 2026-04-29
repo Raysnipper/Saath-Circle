@@ -4,11 +4,8 @@ import { InviteAccessButton } from "@/components/InviteAccessButton";
 import { Nav } from "@/components/Nav";
 import { authOptions } from "@/lib/auth";
 import { hashInvitationToken, isInvitationExpired, normalizeEmail } from "@/lib/invitations";
+import { formatCurrency } from "@/lib/money";
 import { prisma } from "@/lib/prisma";
-
-function formatCurrency(amount: number) {
-  return `\u20B9${amount.toFixed(2)}`;
-}
 
 function displayName(name?: string | null, email?: string | null) {
   return name || email || "Someone";
@@ -98,12 +95,12 @@ export default async function InviteEntry({
           {canClaim || alreadyConnected ? (
             <div className="rounded-xl border bg-muted/30 p-5 space-y-2">
               <p>
-                <span className="font-medium">Lender:</span>{" "}
+                <span className="font-medium">Sent by:</span>{" "}
                 {displayName(invitation.loan.lender.name, invitation.loan.lender.email)}
               </p>
               <p>
-                <span className="font-medium">Loan:</span>{" "}
-                {invitation.loan.title || "Personal Loan"}
+                <span className="font-medium">Handshake:</span>{" "}
+                {invitation.loan.title || "Shared Record"}
               </p>
               <p>
                 <span className="font-medium">Amount:</span>{" "}
@@ -116,7 +113,7 @@ export default async function InviteEntry({
             </div>
           ) : (
             <p className="text-sm text-muted-foreground">
-              Sign in with the invited Google account before the loan details are shown.
+              Sign in with the invited Google account before the handshake details are shown.
             </p>
           )}
 

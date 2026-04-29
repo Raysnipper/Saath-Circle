@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getLastActivity } from "@/lib/loan-history";
+import { moneyToNumber } from "@/lib/money";
 import { LoanCard } from "@/components/LoanCard";
 import { LoanForm } from "@/components/LoanForm";
 import { Nav } from "@/components/Nav";
@@ -115,9 +116,9 @@ export default async function Home({
 
       const confirmedRepaid = loan.transactions
         .filter((transaction) => transaction.status === "CONFIRMED")
-        .reduce((sum, transaction) => sum + transaction.amount, 0);
+        .reduce((sum, transaction) => sum + moneyToNumber(transaction.amount), 0);
 
-      const outstanding = loan.amount - confirmedRepaid;
+      const outstanding = moneyToNumber(loan.amount) - confirmedRepaid;
 
       if (outstanding > 0) {
         if (loan.lenderId === session.user.id) {
@@ -183,7 +184,7 @@ export default async function Home({
               </div>
               <div className="dashboard-card p-6 sm:p-8 flex flex-col items-center justify-center text-center">
                 <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface/40 mb-4 sm:mb-5">
-                  Support Extended
+                  Support Sent
                 </p>
                 <div className="font-sans text-[2.2rem] sm:text-[2.8rem] font-bold leading-none tracking-tight tabular-nums text-[#84A98C]">
                   {"\u20B9"}{owedToYou.toFixed(2)}
@@ -282,7 +283,14 @@ export default async function Home({
                   {visibleLoans.map((loan) => (
                     <LoanCard
                       key={loan.id}
-                      loan={loan}
+                      loan={{
+                        ...loan,
+                        amount: moneyToNumber(loan.amount),
+                        transactions: loan.transactions.map((transaction) => ({
+                          ...transaction,
+                          amount: moneyToNumber(transaction.amount),
+                        })),
+                      }}
                       currentUserId={session.user.id}
                     />
                   ))}

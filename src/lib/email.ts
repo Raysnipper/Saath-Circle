@@ -41,6 +41,10 @@ function capitalizeName(name: string) {
     .join(" ");
 }
 
+function formatMoney(amount: number) {
+  return `INR ${amount.toFixed(2)}`;
+}
+
 function getBaseUrl() {
   return getOptionalEnv("NEXTAUTH_URL") || "http://localhost:3000";
 }
@@ -72,6 +76,55 @@ function getTransportConfig() {
     },
     from,
   };
+}
+
+function renderEmailShell({
+  eyebrow,
+  title,
+  body,
+  ctaUrl,
+  ctaLabel,
+  footer,
+}: {
+  eyebrow: string;
+  title: string;
+  body: string;
+  ctaUrl: string;
+  ctaLabel: string;
+  footer?: string;
+}) {
+  return `
+    <div style="margin:0;padding:0;background:#fbf9f6;color:#2f1f21;">
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="border-collapse:collapse;background:#fbf9f6;">
+        <tr>
+          <td align="center" style="padding:32px 16px;">
+            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:560px;border-collapse:collapse;background:#fffdf9;border:1px solid #eaded7;border-radius:24px;overflow:hidden;box-shadow:0 16px 42px rgba(75,38,42,0.10);">
+              <tr>
+                <td style="padding:26px 28px 18px;background:#4b2028;color:#fffdf9;">
+                  <div style="font-family:Arial,Helvetica,sans-serif;font-size:12px;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:#f2c7bd;">Saath Circle</div>
+                  <div style="margin-top:16px;font-family:Georgia,'Times New Roman',serif;font-size:30px;line-height:1.1;font-weight:700;">${title}</div>
+                  <div style="margin-top:10px;font-family:Arial,Helvetica,sans-serif;font-size:13px;letter-spacing:0.08em;text-transform:uppercase;color:#f7ddd4;">${eyebrow}</div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:28px;font-family:Georgia,'Times New Roman',serif;font-size:18px;line-height:1.65;color:#2f1f21;">
+                  ${body}
+                  <div style="margin-top:28px;">
+                    <a href="${ctaUrl}" style="display:inline-block;padding:14px 22px;background:#4b2028;color:#fffdf9;text-decoration:none;border-radius:999px;font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase;">
+                      ${ctaLabel}
+                    </a>
+                  </div>
+                  <div style="margin-top:26px;padding-top:18px;border-top:1px solid #eaded7;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.5;color:#7a6662;">
+                    ${footer || `If the button does not work, open this link:<br /><a href="${ctaUrl}" style="color:#4b2028;">${ctaUrl}</a>`}
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </div>
+  `;
 }
 
 async function sendEmail({
@@ -133,32 +186,30 @@ export async function sendBorrowerLoanNotification({
 }: BorrowerNotificationInput): Promise<EmailResult> {
   const acknowledgeUrl = `${getBaseUrl()}/invite/${inviteToken}`;
   const borrowerDisplay = borrowerName ? capitalizeName(borrowerName) : borrowerEmail;
-  const lenderDisplay = lenderName ? capitalizeName(lenderName) : lenderEmail || "Someone";
+  const senderDisplay = lenderName ? capitalizeName(lenderName) : lenderEmail || "Someone";
 
   return sendEmail({
     to: borrowerEmail,
-    subject: `${lenderDisplay} asked you to acknowledge a loan on Saath Circle`,
+    subject: `${senderDisplay} sent you a handshake on Saath Circle`,
     text: [
       `Hi ${borrowerDisplay},`,
       "",
-      `${lenderDisplay} recorded a loan for INR ${amount.toFixed(2)}${loanTitle ? ` (${loanTitle})` : ""}.`,
-      "Please review and acknowledge it in Saath Circle.",
+      `${senderDisplay} recorded a handshake with you for ${formatMoney(amount)}${loanTitle ? ` (${loanTitle})` : ""}.`,
+      "Please sign in with the invited Google account to review and acknowledge it in Saath Circle.",
       "",
-      `Open this link to sign in and review the loan: ${acknowledgeUrl}`,
+      `Open this link to review the handshake: ${acknowledgeUrl}`,
     ].join("\n"),
-    html: `
-      <div style="font-family: Georgia, serif; line-height: 1.6; color: #1f1f1f;">
-        <p>Hi ${borrowerDisplay},</p>
-        <p><strong>${lenderDisplay}</strong> recorded a loan for <strong>INR ${amount.toFixed(2)}</strong>${loanTitle ? ` (${loanTitle})` : ""}.</p>
-        <p>Please review and acknowledge it in Saath Circle.</p>
-        <p>
-          <a href="${acknowledgeUrl}" style="display:inline-block;padding:12px 18px;background:#111;color:#fff;text-decoration:none;border-radius:999px;">
-            Review Loan
-          </a>
-        </p>
-        <p style="color:#666;font-size:14px;">If the button does not work, open this link:<br />${acknowledgeUrl}</p>
-      </div>
-    `,
+    html: renderEmailShell({
+      eyebrow: "Private handshake invitation",
+      title: "Review a handshake",
+      ctaUrl: acknowledgeUrl,
+      ctaLabel: "Review Handshake",
+      body: `
+        <p style="margin:0 0 14px;">Hi ${borrowerDisplay},</p>
+        <p style="margin:0 0 14px;"><strong>${senderDisplay}</strong> recorded a handshake with you for <strong>${formatMoney(amount)}</strong>${loanTitle ? ` (${loanTitle})` : ""}.</p>
+        <p style="margin:0;">Please sign in with the invited Google account to review and acknowledge it in Saath Circle.</p>
+      `,
+    }),
   });
 }
 
@@ -172,29 +223,28 @@ export async function sendLenderAcknowledgementNotification({
   amount,
 }: LenderAcknowledgementInput): Promise<EmailResult> {
   const loanUrl = `${getBaseUrl()}/loan/${loanId}`;
-  const lenderDisplay = lenderName ? capitalizeName(lenderName) : lenderEmail;
+  const recipientDisplay = lenderName ? capitalizeName(lenderName) : lenderEmail;
   const borrowerDisplay = borrowerName ? capitalizeName(borrowerName) : borrowerEmail || "Your borrower";
 
   return sendEmail({
     to: lenderEmail,
-    subject: `${borrowerDisplay} acknowledged your loan on Saath Circle`,
+    subject: `${borrowerDisplay} acknowledged your handshake on Saath Circle`,
     text: [
-      `Hi ${lenderDisplay},`,
+      `Hi ${recipientDisplay},`,
       "",
-      `${borrowerDisplay} acknowledged the loan ${loanTitle ? `"${loanTitle}"` : ""} for INR ${amount.toFixed(2)}.`,
-      `Review the loan here: ${loanUrl}`,
+      `${borrowerDisplay} acknowledged the handshake ${loanTitle ? `"${loanTitle}"` : ""} for ${formatMoney(amount)}.`,
+      `Review the handshake here: ${loanUrl}`,
     ].join("\n"),
-    html: `
-      <div style="font-family: Georgia, serif; line-height: 1.6; color: #1f1f1f;">
-        <p>Hi ${lenderDisplay},</p>
-        <p><strong>${borrowerDisplay}</strong> acknowledged the loan${loanTitle ? ` <strong>${loanTitle}</strong>` : ""} for <strong>INR ${amount.toFixed(2)}</strong>.</p>
-        <p>
-          <a href="${loanUrl}" style="display:inline-block;padding:12px 18px;background:#111;color:#fff;text-decoration:none;border-radius:999px;">
-            View Loan
-          </a>
-        </p>
-      </div>
-    `,
+    html: renderEmailShell({
+      eyebrow: "Handshake acknowledged",
+      title: "Your handshake is active",
+      ctaUrl: loanUrl,
+      ctaLabel: "View Handshake",
+      body: `
+        <p style="margin:0 0 14px;">Hi ${recipientDisplay},</p>
+        <p style="margin:0;"><strong>${borrowerDisplay}</strong> acknowledged the handshake${loanTitle ? ` <strong>${loanTitle}</strong>` : ""} for <strong>${formatMoney(amount)}</strong>.</p>
+      `,
+    }),
   });
 }
 
@@ -209,32 +259,30 @@ export async function sendLenderRepaymentNotification({
   outstandingAmount,
 }: LenderRepaymentInput): Promise<EmailResult> {
   const loanUrl = `${getBaseUrl()}/loan/${loanId}`;
-  const lenderDisplay = lenderName ? capitalizeName(lenderName) : lenderEmail;
+  const recipientDisplay = lenderName ? capitalizeName(lenderName) : lenderEmail;
   const borrowerDisplay = borrowerName ? capitalizeName(borrowerName) : borrowerEmail || "Your borrower";
 
   return sendEmail({
     to: lenderEmail,
     subject: `${borrowerDisplay} recorded a repayment on Saath Circle`,
     text: [
-      `Hi ${lenderDisplay},`,
+      `Hi ${recipientDisplay},`,
       "",
-      `${borrowerDisplay} recorded a repayment of INR ${repaymentAmount.toFixed(2)}${loanTitle ? ` toward ${loanTitle}` : ""}.`,
-      `Outstanding after confirmation would be INR ${outstandingAmount.toFixed(2)}.`,
+      `${borrowerDisplay} recorded a repayment of ${formatMoney(repaymentAmount)}${loanTitle ? ` toward ${loanTitle}` : ""}.`,
+      `Outstanding after confirmation would be ${formatMoney(outstandingAmount)}.`,
       `Review and confirm it here: ${loanUrl}`,
     ].join("\n"),
-    html: `
-      <div style="font-family: Georgia, serif; line-height: 1.6; color: #1f1f1f;">
-        <p>Hi ${lenderDisplay},</p>
-        <p><strong>${borrowerDisplay}</strong> recorded a repayment of <strong>INR ${repaymentAmount.toFixed(2)}</strong>${loanTitle ? ` toward <strong>${loanTitle}</strong>` : ""}.</p>
-        <p>Outstanding after confirmation would be <strong>INR ${outstandingAmount.toFixed(2)}</strong>.</p>
-        <p>
-          <a href="${loanUrl}" style="display:inline-block;padding:12px 18px;background:#111;color:#fff;text-decoration:none;border-radius:999px;">
-            Review Repayment
-          </a>
-        </p>
-        </p>
-      </div>
-    `,
+    html: renderEmailShell({
+      eyebrow: "Repayment review",
+      title: "A repayment needs review",
+      ctaUrl: loanUrl,
+      ctaLabel: "Review Repayment",
+      body: `
+        <p style="margin:0 0 14px;">Hi ${recipientDisplay},</p>
+        <p style="margin:0 0 14px;"><strong>${borrowerDisplay}</strong> recorded a repayment of <strong>${formatMoney(repaymentAmount)}</strong>${loanTitle ? ` toward <strong>${loanTitle}</strong>` : ""}.</p>
+        <p style="margin:0;">Outstanding after confirmation would be <strong>${formatMoney(outstandingAmount)}</strong>.</p>
+      `,
+    }),
   });
 }
 
@@ -262,26 +310,25 @@ export async function sendNudgeNotification({
 
   return sendEmail({
     to: receiverEmail,
-    subject: `☕ ${senderDisplay} sent you a virtual chai on Saath Circle`,
+    subject: `${senderDisplay} sent you a virtual chai on Saath Circle`,
     text: [
       `Hi ${receiverDisplay},`,
       "",
-      `${senderDisplay} just nudged you regarding the handshake for INR ${amount.toFixed(2)}${loanTitle ? ` (${loanTitle})` : ""}.`,
+      `${senderDisplay} just nudged you regarding the handshake for ${formatMoney(amount)}${loanTitle ? ` (${loanTitle})` : ""}.`,
       "Head over to Saath Circle to review your active bonds.",
       "",
       `Open this link: ${baseUrl}`,
     ].join("\n"),
-    html: `
-      <div style="font-family: Georgia, serif; line-height: 1.6; color: #1f1f1f;">
-        <p>Hi ${receiverDisplay},</p>
-        <p>☕ <strong>${senderDisplay}</strong> sent you a virtual chai regarding your active bond for <strong>INR ${amount.toFixed(2)}</strong>${loanTitle ? ` (${loanTitle})` : ""}.</p>
-        <p>Head over to Saath Circle to review your active bonds.</p>
-        <p>
-          <a href="${baseUrl}" style="display:inline-block;padding:12px 18px;background:#111;color:#fff;text-decoration:none;border-radius:999px;">
-            Open Saath Circle
-          </a>
-        </p>
-      </div>
-    `,
+    html: renderEmailShell({
+      eyebrow: "Gentle check-in",
+      title: "A Saath Circle nudge",
+      ctaUrl: baseUrl,
+      ctaLabel: "Open Saath Circle",
+      body: `
+        <p style="margin:0 0 14px;">Hi ${receiverDisplay},</p>
+        <p style="margin:0 0 14px;"><strong>${senderDisplay}</strong> sent you a virtual chai about your active bond for <strong>${formatMoney(amount)}</strong>${loanTitle ? ` (${loanTitle})` : ""}.</p>
+        <p style="margin:0;">Head over to Saath Circle to review your active bonds.</p>
+      `,
+    }),
   });
 }

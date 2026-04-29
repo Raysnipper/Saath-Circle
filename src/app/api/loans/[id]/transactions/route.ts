@@ -1,12 +1,15 @@
 import { NextResponse } from "next/server";
+import type { Prisma } from "@prisma/client";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendLenderRepaymentNotification } from "@/lib/email";
+import { moneyToNumber } from "@/lib/money";
+import { createRepaymentSchema, reviewTransactionSchema } from "@/lib/validation";
 
 type LoanTransaction = {
   id: string;
-  amount: number;
+  amount: Prisma.Decimal;
   status: string;
 };
 
@@ -24,12 +27,16 @@ export async function POST(
     // next.js 15 requirement
     const { id } = await params;
 
-    const body = await req.json();
-    const { amount } = body;
+    const body = createRepaymentSchema.safeParse(await req.json());
 
-    if (!amount || amount <= 0) {
-      return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
+    if (!body.success) {
+      return NextResponse.json(
+        { error: body.error.issues[0]?.message || "Invalid repayment amount" },
+        { status: 400 }
+      );
     }
+
+    const { amount } = body.data;
 
     const loan = await prisma.loan.findUnique({
       where: { id },
@@ -54,17 +61,17 @@ export async function POST(
 
     const reservedAmount = loan.transactions
       .filter((transaction: LoanTransaction) => transaction.status !== "REJECTED")
-      .reduce((sum: number, transaction: LoanTransaction) => sum + transaction.amount, 0);
+      .reduce((sum: number, transaction: LoanTransaction) => sum + moneyToNumber(transaction.amount), 0);
 
-    const availableOutstanding = loan.amount - reservedAmount;
+    const availableOutstanding = moneyToNumber(loan.amount) - reservedAmount;
 
-    if (parseFloat(amount) > availableOutstanding) {
+    if (Number(amount) > availableOutstanding) {
       return NextResponse.json({ error: "Repayment exceeds outstanding balance" }, { status: 400 });
     }
 
     const transaction = await prisma.transaction.create({
       data: {
-        amount: parseFloat(amount),
+        amount,
         status: "PENDING",
         loanId: loan.id,
       },
@@ -77,9 +84,9 @@ export async function POST(
           borrowerName: loan.borrower?.name,
           borrowerEmail: loan.borrower?.email || loan.borrowerEmail,
           loanId: loan.id,
-          loanTitle: loan.title || "Personal Loan",
-          repaymentAmount: transaction.amount,
-          outstandingAmount: availableOutstanding - transaction.amount,
+          loanTitle: loan.title || "Shared Record",
+          repaymentAmount: moneyToNumber(transaction.amount),
+          outstandingAmount: availableOutstanding - moneyToNumber(transaction.amount),
         })
       : { sent: false, reason: "Lender email is missing." as const };
 
@@ -108,8 +115,16 @@ export async function PATCH(
     // This expects the transaction ID to be passed as part of the body, and the loan ID in the url
     const { id } = await params;
 
-    const body = await req.json();
-    const { transactionId, status } = body; // status should be CONFIRMED or REJECTED
+    const body = reviewTransactionSchema.safeParse(await req.json());
+
+    if (!body.success) {
+      return NextResponse.json(
+        { error: body.error.issues[0]?.message || "Invalid review details" },
+        { status: 400 }
+      );
+    }
+
+    const { transactionId, status } = body.data;
 
     const loan = await prisma.loan.findUnique({
       where: { id },
@@ -141,9 +156,9 @@ export async function PATCH(
       );
     }
 
-    // Only lender can confirm payments
+    // Only the person who sent support can confirm payments.
     if (loan.lenderId !== session.user.id) {
-      return NextResponse.json({ error: "Only the lender can confirm transactions" }, { status: 403 });
+      return NextResponse.json({ error: "Only the person who sent support can confirm repayments" }, { status: 403 });
     }
 
     const transaction = await prisma.transaction.update({
@@ -160,9 +175,9 @@ export async function PATCH(
           entry.id === transactionId ? { ...entry, status: "CONFIRMED" } : entry
         )
         .filter((entry: LoanTransaction) => entry.status === "CONFIRMED")
-        .reduce((sum: number, entry: LoanTransaction) => sum + entry.amount, 0);
+        .reduce((sum: number, entry: LoanTransaction) => sum + moneyToNumber(entry.amount), 0);
 
-      if (confirmedTotal >= loan.amount) {
+      if (confirmedTotal >= moneyToNumber(loan.amount)) {
         await prisma.loan.update({
           where: { id: loan.id },
           data: {

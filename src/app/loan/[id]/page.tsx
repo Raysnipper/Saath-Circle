@@ -11,6 +11,7 @@ import { authOptions } from "@/lib/auth";
 import { Nav } from "@/components/Nav";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatCurrency, moneyToNumber } from "@/lib/money";
 import { prisma } from "@/lib/prisma";
 
 type LoanWithRelations = Prisma.LoanGetPayload<{
@@ -39,10 +40,6 @@ function displayName(name?: string | null, email?: string | null) {
     .slice(0, 2)
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
     .join(" ");
-}
-
-function formatCurrency(amount: number) {
-  return `\u20B9${amount.toFixed(2)}`;
 }
 
 function statusTone(status: string) {
@@ -127,12 +124,12 @@ export default async function LoanTimeline({
 
   const confirmedPayments = loan.transactions
     .filter((transaction) => transaction.status === "CONFIRMED")
-    .reduce((sum, transaction) => sum + transaction.amount, 0);
+    .reduce((sum, transaction) => sum + moneyToNumber(transaction.amount), 0);
 
-  const outstanding = loan.amount - confirmedPayments;
+  const outstanding = moneyToNumber(loan.amount) - confirmedPayments;
   const isBorrower = loan.borrowerId === session.user.id;
   const isLender = loan.lenderId === session.user.id;
-  const roleLabel = isBorrower ? "Borrower View" : "Lender View";
+  const roleLabel = isBorrower ? "Received Support" : "Support Sent";
   const lenderName = displayName(loan.lender.name, loan.lender.email);
   const borrowerName = displayName(loan.borrower?.name, loan.borrower?.email || loan.borrowerEmail);
   const otherPersonName = isBorrower ? lenderName : borrowerName;
@@ -142,7 +139,7 @@ export default async function LoanTimeline({
       id: "created",
       title: "Record Created",
       timestamp: loan.createdAt,
-      description: `${lenderName} recorded a shared balance with ${borrowerName} for ${formatCurrency(loan.amount)}.`,
+      description: `${lenderName} sent a handshake to ${borrowerName} for ${formatCurrency(loan.amount)}.`,
       tone: "primary",
     },
   ];
@@ -181,7 +178,7 @@ export default async function LoanTimeline({
         description:
           transaction.status === "CONFIRMED"
             ? `${lenderName} confirmed the repayment of ${formatCurrency(transaction.amount)}.`
-            : `${lenderName} rejected the repayment of ${formatCurrency(transaction.amount)}.`,
+            : `${lenderName} marked the repayment as not confirmed for ${formatCurrency(transaction.amount)}.`,
         tone: transaction.status === "CONFIRMED" ? "emerald" : "rose",
         badge: transaction.status,
       });

@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendNudgeNotification } from "@/lib/email";
+import { moneyToNumber } from "@/lib/money";
 
 export async function POST(
   req: Request,
@@ -58,7 +59,7 @@ export async function POST(
           senderName,
           loanId: loan.id,
           loanTitle: loan.title,
-          amount: loan.amount,
+          amount: moneyToNumber(loan.amount),
         })
       : { sent: false, reason: "Receiver email is missing." as const };
 

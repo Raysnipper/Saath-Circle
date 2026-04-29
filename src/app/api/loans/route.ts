@@ -9,6 +9,8 @@ import {
   invitationExpiresAt,
   normalizeEmail,
 } from "@/lib/invitations";
+import { moneyToNumber } from "@/lib/money";
+import { createLoanSchema } from "@/lib/validation";
 
 export async function POST(req: Request) {
   try {
@@ -18,20 +20,21 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const body = await req.json();
-    const { amount, title, borrowerEmail } = body;
-    const normalizedBorrowerEmail =
-      typeof borrowerEmail === "string" ? normalizeEmail(borrowerEmail) : "";
+    const body = createLoanSchema.safeParse(await req.json());
+
+    if (!body.success) {
+      return NextResponse.json(
+        { error: body.error.issues[0]?.message || "Invalid handshake details" },
+        { status: 400 }
+      );
+    }
+
+    const { amount, title, borrowerEmail: normalizedBorrowerEmail } = body.data;
     const sessionEmail = session.user.email
       ? normalizeEmail(session.user.email)
       : "";
 
-    // Optional validation
-    if (!amount || amount <= 0) {
-      return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
-    }
-
-    if (!normalizedBorrowerEmail || normalizedBorrowerEmail === sessionEmail) {
+    if (normalizedBorrowerEmail === sessionEmail) {
       return NextResponse.json({ error: "Invalid borrower email" }, { status: 400 });
     }
 
@@ -44,8 +47,8 @@ export async function POST(req: Request) {
 
     const loan = await prisma.loan.create({
       data: {
-        amount: parseFloat(amount),
-        title: title || "Personal Loan",
+        amount,
+        title,
         status: "PENDING", // PENDING ACKNOWLEDGMENT
         lenderId: session.user.id,
         borrowerId: registeredBorrowerId,
@@ -73,8 +76,8 @@ export async function POST(req: Request) {
       lenderName: session.user.name,
       lenderEmail: session.user.email,
       inviteToken,
-      loanTitle: loan.title || "Personal Loan",
-      amount: loan.amount,
+      loanTitle: loan.title || "Shared Record",
+      amount: moneyToNumber(loan.amount),
     });
 
     return NextResponse.json({ loan, notification }, { status: 201 });

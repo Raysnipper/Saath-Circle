@@ -21,7 +21,7 @@ export function AcknowledgeLoanButton({ loanId }: { loanId: string }) {
         throw new Error("Failed to acknowledge");
       }
 
-      toast.success("Loan acknowledged!");
+      toast.success("Handshake acknowledged!");
       router.refresh();
     } catch (error) {
       toast.error(
@@ -34,7 +34,7 @@ export function AcknowledgeLoanButton({ loanId }: { loanId: string }) {
 
   return (
     <Button onClick={handleAcknowledge} disabled={loading} className="w-full sm:w-auto">
-      {loading ? "Acknowledging..." : "Acknowledge Loan"}
+      {loading ? "Acknowledging..." : "Acknowledge Handshake"}
     </Button>
   );
 }

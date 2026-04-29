@@ -22,7 +22,7 @@ export default async function LegacyBorrowerAcknowledgeEntry({
   });
 
   if (!loan) {
-    return <div className="p-8 text-center">Loan not found.</div>;
+    return <div className="p-8 text-center">Handshake not found.</div>;
   }
 
   if (
@@ -61,7 +61,7 @@ export default async function LegacyBorrowerAcknowledgeEntry({
           ) : null}
 
           <p className="text-sm text-muted-foreground">
-            For privacy, loan details are now opened through secure invitation
+            For privacy, handshake details are now opened through secure invitation
             links. Ask the sender to create or resend the handshake invitation.
           </p>
         </div>

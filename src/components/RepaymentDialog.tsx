@@ -51,7 +51,7 @@ export function RepaymentDialog({
       toast.success("Repayment recorded", {
         description: data.notification?.sent
           ? `A review email has been sent to ${counterpartyName}.`
-          : "Repayment saved and is awaiting lender confirmation.",
+          : "Repayment saved and is awaiting confirmation from the person who sent support.",
       });
 
       setAmount("");

@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { sendLenderAcknowledgementNotification } from "@/lib/email";
+import { moneyToNumber } from "@/lib/money";
 
 export async function POST(
   req: Request,
@@ -31,7 +32,7 @@ export async function POST(
     }
 
     if (loan.borrowerId !== session.user.id) {
-      return NextResponse.json({ error: "Not authorized to acknowledge this loan" }, { status: 403 });
+      return NextResponse.json({ error: "Not authorized to acknowledge this handshake" }, { status: 403 });
     }
 
     const updated = await prisma.loan.update({
@@ -49,8 +50,8 @@ export async function POST(
           borrowerName: loan.borrower?.name,
           borrowerEmail: loan.borrower?.email || loan.borrowerEmail,
           loanId: loan.id,
-          loanTitle: loan.title || "Personal Loan",
-          amount: loan.amount,
+          loanTitle: loan.title || "Shared Record",
+          amount: moneyToNumber(loan.amount),
         })
       : { sent: false, reason: "Lender email is missing." as const };
 
