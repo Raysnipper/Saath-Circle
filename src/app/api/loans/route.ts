@@ -50,15 +50,22 @@ export async function POST(req: Request) {
         lenderId: session.user.id,
         borrowerId: registeredBorrowerId,
         borrowerEmail: normalizedBorrowerEmail,
-        invitations: {
-          create: {
-            email: normalizedBorrowerEmail,
-            tokenHash: hashInvitationToken(inviteToken),
-            expiresAt: invitationExpiresAt(),
-          },
-        },
       },
     });
+
+    try {
+      await prisma.loanInvitation.create({
+        data: {
+          loanId: loan.id,
+          email: normalizedBorrowerEmail,
+          tokenHash: hashInvitationToken(inviteToken),
+          expiresAt: invitationExpiresAt(),
+        },
+      });
+    } catch (error) {
+      await prisma.loan.delete({ where: { id: loan.id } }).catch(() => null);
+      throw error;
+    }
 
     const notification = await sendBorrowerLoanNotification({
       borrowerEmail: normalizedBorrowerEmail,

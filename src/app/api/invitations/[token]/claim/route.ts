@@ -60,22 +60,21 @@ export async function POST(
       );
     }
 
-    await prisma.$transaction([
-      prisma.loan.update({
-        where: { id: invitation.loanId },
-        data: {
-          borrowerId: session.user.id,
-          borrowerEmail: invitedEmail,
-        },
-      }),
-      prisma.loanInvitation.update({
-        where: { id: invitation.id },
-        data: {
-          acceptedAt: invitation.acceptedAt ?? new Date(),
-          acceptedById: session.user.id,
-        },
-      }),
-    ]);
+    await prisma.loan.update({
+      where: { id: invitation.loanId },
+      data: {
+        borrowerId: session.user.id,
+        borrowerEmail: invitedEmail,
+      },
+    });
+
+    await prisma.loanInvitation.update({
+      where: { id: invitation.id },
+      data: {
+        acceptedAt: invitation.acceptedAt ?? new Date(),
+        acceptedById: session.user.id,
+      },
+    });
 
     return NextResponse.json({ loanId: invitation.loanId });
   } catch (error) {
