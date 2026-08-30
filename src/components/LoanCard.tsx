@@ -2,19 +2,16 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Coffee } from "lucide-react";
+import { Coffee, ChevronDown } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { NudgeDialog } from "@/components/NudgeDialog";
 import { AcknowledgeLoanButton } from "@/components/AcknowledgeLoanButton";
 import { RepaymentDialog } from "@/components/RepaymentDialog";
 import { TransactionReviewActions } from "@/components/TransactionReviewActions";
 import { Badge } from "@/components/ui/badge";
 import { formatShortDate, getLastActivity } from "@/lib/loan-history";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
+import { formatCurrency } from "@/lib/money";
+import { Card } from "@/components/ui/card";
 
 type Loan = {
   id: string;
@@ -38,14 +35,6 @@ type Loan = {
   }[];
   lastNudgedAt?: Date | null;
 };
-
-function formatCurrency(amount: number) {
-  const formatted = new Intl.NumberFormat('en-IN', {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(amount);
-  return `\u20B9${formatted}`;
-}
 
 function toDisplayName(name?: string | null, email?: string | null) {
   const raw = (name && name.trim()) || (email ? email.split("@")[0] : "Unknown");
@@ -151,6 +140,7 @@ export function LoanCard({
   const lastActivity = getLastActivity(loan);
 
   const [isNudged, setIsNudged] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   useEffect(() => {
     let nudgedAtTime = loan.lastNudgedAt ? new Date(loan.lastNudgedAt).getTime() : 0;
@@ -168,254 +158,315 @@ export function LoanCard({
     }
   }, [loan.id, loan.lastNudgedAt]);
 
+  const percentRepaid =
+    loan.amount > 0
+      ? Math.min(100, Math.max(0, Math.round((confirmedPayments / loan.amount) * 100)))
+      : 0;
+
   return (
     <Card
       size="sm"
-      className={`dashboard-card overflow-hidden transition-all hover:-translate-y-1 hover:shadow-xl ${isCompleted ? "!bg-surface/50 opacity-80" : ""}`}
+      className={`dashboard-card overflow-hidden transition-all hover:shadow-lg ${isCompleted ? "!bg-surface/50 opacity-85" : ""}`}
     >
-      <CardHeader className="space-y-2 pb-2 sm:space-y-3">
-        <div
-          className={`rounded-[1.1rem] border p-2.5 sm:rounded-[1.35rem] sm:p-3 ${isCompleted ? "border-stone-200/80 bg-stone-100/70" : "border-white/60 bg-background/75"}`}
-        >
-          <div className="flex items-start gap-2.5">
-            <div
-              className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-[1rem] text-sm font-semibold sm:h-10 sm:w-10 sm:rounded-[1.1rem] ${isCompleted ? "bg-stone-200 text-stone-700" : palette.avatar}`}
-            >
-              {counterpartName
-                .split(" ")
-                .slice(0, 2)
-                .map((part) => part[0])
-                .join("")
-                .toUpperCase()}
-            </div>
-
-            <div className="min-w-0 flex-1">
-              <div className="flex items-start justify-between gap-2">
-                <div className="min-w-0">
-                  <div className={`truncate text-[0.95rem] font-semibold sm:text-base ${isCompleted ? "text-stone-700" : "text-foreground"}`}>
-                    {counterpartName}
-                  </div>
-                  {loan.title && (
-                    <div className={`mt-0.5 line-clamp-1 text-[0.64rem] uppercase tracking-[0.13em] sm:text-[0.68rem] ${isCompleted ? "text-stone-500" : "text-muted-foreground"}`}>
-                      {loan.title}
-                    </div>
-                  )}
-                </div>
-                <div className="flex items-center gap-1.5 shrink-0">
-                  <Badge
-                    variant="outline"
-                    className={`${statusTone(loan.status)} shrink-0 rounded-[0.5rem] px-2 py-1 text-[0.5rem] font-bold tracking-[0.1em] shadow-none sm:px-2.5 sm:py-1.5 sm:text-[0.55rem] uppercase text-center leading-[1.15]`}
-                  >
-                    {loan.status === 'PENDING' ? (
-                      <span>Awaiting<br />Handshake</span>
-                    ) : loan.status === 'ACTIVE' ? 'In Progress' : loan.status === 'COMPLETED' ? (
-                      <span>Settled<br />w/ Grace</span>
-                    ) : loan.status}
-                  </Badge>
-                  {(loan.status === 'ACTIVE' || loan.status === 'PENDING') && (
-                    <NudgeDialog
-                      loanId={loan.id}
-                      counterpartName={counterpartName}
-                      onNudged={() => setIsNudged(true)}
-                    >
-                      <button className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#fdf5ed] border border-[#f5eadf] text-[#2F1400] hover:bg-[#f5e6d8] transition-colors cursor-pointer group relative shadow-sm">
-                        <Coffee className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-colors ${isNudged ? "text-[#E07A5F] fill-[#E07A5F]/20 animate-pulse" : ""}`} strokeWidth={2.5} />
-                        {isNudged && (
-                          <span className="absolute top-0 right-0 flex h-2 w-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#E07A5F] opacity-75 mt-0.5 mr-0.5"></span>
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-[#E07A5F] mt-0.5 mr-0.5"></span>
-                          </span>
-                        )}
-                      </button>
-                    </NudgeDialog>
-                  )}
-                </div>
-              </div>
-
-              <div className="mt-2 flex items-end justify-between gap-2">
-                <div className="min-w-0">
-                  <div 
-                    className={`truncate text-[1.45rem] font-bold leading-none tracking-tight sm:text-[2rem] ${isCompleted ? "text-stone-700" : "text-foreground"}`}
-                    title={formatCurrency(outstanding)}
-                  >
-                    {formatCurrency(outstanding)}
-                  </div>
-                  <p className={`mt-1 text-[0.68rem] sm:text-xs ${isCompleted ? "text-stone-500" : "text-muted-foreground"}`}>
-                    {isCompleted ? "settled record" : "currently open"}
-                  </p>
-                </div>
-
-                <div
-                  className={`flex shrink-0 w-max flex-col items-center justify-center rounded-[1rem] border px-2 py-1 text-[0.5rem] font-bold uppercase leading-tight tracking-[0.1em] sm:rounded-[1.1rem] sm:text-[0.55rem] text-center ${isCompleted ? "border-stone-300 bg-stone-100 text-stone-700" : palette.chip}`}
-                >
-                  <span>{isLender ? "EXTENDED" : "RECEIVED"}</span>
-                  <span>SUPPORT</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div
-          className={`rounded-[1.1rem] border px-2.5 py-2 sm:rounded-[1.35rem] sm:px-3 sm:py-2.5 ${isCompleted ? "border-stone-200 bg-stone-100/60" : palette.meta}`}
-        >
-          <div className="grid grid-cols-2 gap-2">
-            <div className="space-y-0.5">
-              <div className="text-[0.62rem] uppercase tracking-[0.15em] text-muted-foreground">
-                Created
-              </div>
-              <div className="text-xs font-semibold text-foreground sm:text-sm">
-                {formatShortDate(new Date(loan.createdAt))}
-              </div>
-            </div>
-            <div className="space-y-0.5 text-right">
-              <div className="text-[0.62rem] uppercase tracking-[0.15em] text-muted-foreground">
-                {loan.status === "COMPLETED" ? "Status" : "Open For"}
-              </div>
-              <div className="text-xs font-semibold text-foreground sm:text-sm">
-                {loan.status === "COMPLETED" ? "Settled" : ageLabel}
-              </div>
-            </div>
+      {/* Clickable Header for Collapsing/Expanding */}
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={() => setIsExpanded((prev) => !prev)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setIsExpanded((prev) => !prev);
+          }
+        }}
+        className="cursor-pointer select-none p-3.5 sm:p-4 transition-colors hover:bg-black/[0.02]"
+      >
+        <div className="flex items-start gap-2.5">
+          {/* Avatar */}
+          <div
+            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-[1.1rem] text-sm font-semibold sm:h-11 sm:w-11 sm:rounded-[1.2rem] ${isCompleted ? "bg-stone-200 text-stone-700" : palette.avatar}`}
+          >
+            {counterpartName
+              .split(" ")
+              .slice(0, 2)
+              .map((part) => part[0])
+              .join("")
+              .toUpperCase()}
           </div>
 
-          <div className="mt-2 border-t border-white/50 pt-2 sm:border-t-border/50">
-            <div className="flex items-start justify-between gap-3">
-              <div className="text-[0.62rem] uppercase tracking-[0.15em] text-muted-foreground">
-                Last Activity
-              </div>
-              <div className="min-w-0 text-right">
-                <div className="truncate text-xs font-semibold text-foreground sm:text-sm">
-                  {lastActivity.label}
+          {/* Main Info */}
+          <div className="min-w-0 flex-1">
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <div className={`truncate text-[0.95rem] font-bold sm:text-base ${isCompleted ? "text-stone-700" : "text-foreground"}`}>
+                  {counterpartName}
                 </div>
-                <div className="text-[0.68rem] text-muted-foreground">
-                  {formatShortDate(lastActivity.date)}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </CardHeader>
-
-      <CardContent className="space-y-2.5 sm:space-y-3">
-        <div
-          className={`rounded-[1.1rem] border px-2.5 py-2 sm:rounded-[1.35rem] sm:p-3 ${isCompleted ? "border-stone-200 bg-stone-100/50" : "border-white/60 bg-background/65"}`}
-        >
-          <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
-            <div className="min-w-0">
-              <div className={`truncate text-[0.58rem] font-bold uppercase tracking-[0.14em] ${isCompleted ? "text-stone-500" : "text-muted-foreground"}`}>
-                The Support
-              </div>
-              <div className={`mt-1 truncate text-[0.95rem] font-semibold sm:mt-1.5 sm:text-lg ${isCompleted ? "text-stone-700" : ""}`} title={formatCurrency(loan.amount)}>
-                {formatCurrency(loan.amount)}
-              </div>
-            </div>
-            <div className="min-w-0 text-center">
-              <div className={`truncate text-[0.58rem] font-bold uppercase tracking-[0.14em] ${isCompleted ? "text-stone-500" : "text-muted-foreground"}`}>
-                Flowed Back
-              </div>
-              <div className={`mt-1 truncate text-[0.95rem] font-semibold sm:mt-1.5 sm:text-lg ${isCompleted ? "text-stone-700" : "text-emerald-600"}`} title={formatCurrency(confirmedPayments)}>
-                {formatCurrency(confirmedPayments)}
-              </div>
-            </div>
-            <div className="min-w-0 text-right">
-              <div className={`truncate text-[0.58rem] font-bold uppercase tracking-[0.14em] ${isCompleted ? "text-stone-500" : "text-muted-foreground"}`}>
-                Remaining
-              </div>
-              <div className={`mt-1 truncate text-[0.95rem] font-semibold sm:mt-1.5 sm:text-lg ${isCompleted ? "text-stone-600" : ""}`} title={formatCurrency(outstanding)}>
-                {formatCurrency(outstanding)}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {(pendingRepayments.length > 0 || rejectedRepayments.length > 0) && (
-          <div className="space-y-2 border-t border-border/70 pt-2.5 sm:space-y-2.5 sm:pt-3">
-            {pendingRepayments.map((transaction) => (
-              <div
-                key={transaction.id}
-                className="space-y-2 rounded-[1.1rem] border border-amber-500/20 bg-amber-50/50 p-2.5 sm:rounded-[1.2rem] sm:p-3"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <div className="text-xs sm:text-sm">
-                    Repayment of{" "}
-                    <span className="font-semibold">
-                      {formatCurrency(transaction.amount)}
-                    </span>
+                {loan.title && (
+                  <div className={`mt-0.5 line-clamp-1 text-[0.65rem] uppercase tracking-[0.13em] sm:text-[0.68rem] ${isCompleted ? "text-stone-500" : "text-muted-foreground"}`}>
+                    {loan.title}
                   </div>
-                  <Badge variant="outline" className={statusTone(transaction.status)}>
-                    {transaction.status}
-                  </Badge>
-                </div>
-
-                {isLender ? (
-                  <div className="space-y-2">
-                    <p className="text-xs text-amber-700">
-                      Review this repayment directly here.
-                    </p>
-                    <TransactionReviewActions
-                      loanId={loan.id}
-                      transactionId={transaction.id}
-                    />
-                  </div>
-                ) : (
-                  <p className="text-xs text-amber-700">
-                    Waiting for {loan.lender.name || loan.lender.email} to approve.
-                  </p>
                 )}
               </div>
-            ))}
 
-            {isBorrower &&
-              rejectedRepayments.map((transaction) => (
-                <div
-                  key={transaction.id}
-                  className="rounded-[1.1rem] border border-rose-500/20 bg-rose-50/50 p-2.5 sm:rounded-[1.2rem] sm:p-3"
+              {/* Status & Actions */}
+              <div className="flex items-center gap-1.5 shrink-0" onClick={(e) => e.stopPropagation()}>
+                <Badge
+                  variant="outline"
+                  className={`${statusTone(loan.status)} shrink-0 rounded-[0.5rem] px-2 py-1 text-[0.5rem] font-bold tracking-[0.1em] shadow-none sm:px-2.5 sm:py-1 sm:text-[0.55rem] uppercase text-center leading-[1.15]`}
                 >
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="text-xs sm:text-sm">
-                      Repayment of{" "}
-                      <span className="font-semibold">
-                        {formatCurrency(transaction.amount)}
-                      </span>{" "}
-                      was rejected.
+                  {loan.status === 'PENDING' ? (
+                    <span>Awaiting Handshake</span>
+                  ) : loan.status === 'ACTIVE' ? (
+                    'In Progress'
+                  ) : loan.status === 'COMPLETED' ? (
+                    <span>Settled w/ Grace</span>
+                  ) : (
+                    loan.status
+                  )}
+                </Badge>
+
+                {(loan.status === 'ACTIVE' || loan.status === 'PENDING') && (
+                  <NudgeDialog
+                    loanId={loan.id}
+                    counterpartName={counterpartName}
+                    onNudged={() => setIsNudged(true)}
+                  >
+                    <button
+                      type="button"
+                      aria-label="Nudge reminder"
+                      className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#fdf5ed] border border-[#f5eadf] text-[#2F1400] hover:bg-[#f5e6d8] transition-colors cursor-pointer group relative shadow-sm"
+                    >
+                      <Coffee className={`w-3.5 h-3.5 sm:w-4 sm:h-4 transition-colors ${isNudged ? "text-[#E07A5F] fill-[#E07A5F]/20 animate-pulse" : ""}`} strokeWidth={2.5} />
+                      {isNudged && (
+                        <span className="absolute top-0 right-0 flex h-2 w-2">
+                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#E07A5F] opacity-75 mt-0.5 mr-0.5"></span>
+                          <span className="relative inline-flex rounded-full h-2 w-2 bg-[#E07A5F] mt-0.5 mr-0.5"></span>
+                        </span>
+                      )}
+                    </button>
+                  </NudgeDialog>
+                )}
+
+                {/* Chevron Toggle Indicator */}
+                <div className={`flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground transition-transform duration-200 ${isExpanded ? "rotate-180 bg-stone-100" : ""}`}>
+                  <ChevronDown className="h-4 w-4" />
+                </div>
+              </div>
+            </div>
+
+            {/* Amount & Extended/Received Pill */}
+            <div className="mt-2 flex items-end justify-between gap-2">
+              <div className="min-w-0">
+                <div
+                  className={`truncate text-[1.4rem] font-bold leading-none tracking-tight sm:text-[1.85rem] ${isCompleted ? "text-stone-700" : "text-foreground"}`}
+                  title={formatCurrency(outstanding)}
+                >
+                  {formatCurrency(outstanding)}
+                </div>
+                <p className={`mt-1 text-[0.65rem] sm:text-xs ${isCompleted ? "text-stone-500" : "text-muted-foreground"}`}>
+                  {isCompleted ? "settled record" : "currently open"}
+                </p>
+              </div>
+
+              <div
+                className={`flex shrink-0 w-max items-center justify-center rounded-full border px-2.5 py-0.5 text-[0.52rem] font-bold uppercase tracking-[0.12em] sm:text-[0.58rem] text-center ${isCompleted ? "border-stone-300 bg-stone-100 text-stone-700" : palette.chip}`}
+              >
+                <span>{isLender ? "EXTENDED" : "RECEIVED"} SUPPORT</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Expandable Details Container */}
+      <AnimatePresence initial={false}>
+        {isExpanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.22, ease: "easeInOut" }}
+            className="overflow-hidden border-t border-border/60"
+          >
+            <div className="space-y-3 p-3.5 sm:p-4 pt-2">
+              {/* Metadata Box (Created, Open For, Last Activity) */}
+              <div
+                className={`rounded-[1.1rem] border px-2.5 py-2 sm:rounded-[1.35rem] sm:px-3 sm:py-2.5 ${isCompleted ? "border-stone-200 bg-stone-100/60" : palette.meta}`}
+              >
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="space-y-0.5">
+                    <div className="text-[0.62rem] uppercase tracking-[0.15em] text-muted-foreground">
+                      Created
                     </div>
-                    <Badge variant="outline" className={statusTone(transaction.status)}>
-                      {transaction.status}
-                    </Badge>
+                    <div className="text-xs font-semibold text-foreground sm:text-sm">
+                      {formatShortDate(new Date(loan.createdAt))}
+                    </div>
+                  </div>
+                  <div className="space-y-0.5 text-right">
+                    <div className="text-[0.62rem] uppercase tracking-[0.15em] text-muted-foreground">
+                      {loan.status === "COMPLETED" ? "Status" : "Open For"}
+                    </div>
+                    <div className="text-xs font-semibold text-foreground sm:text-sm">
+                      {loan.status === "COMPLETED" ? "Settled" : ageLabel}
+                    </div>
                   </div>
                 </div>
-              ))}
-          </div>
-        )}
-      </CardContent>
 
-      <CardFooter
-        className={`flex justify-end gap-2 pt-2.5 sm:pt-3 ${isCompleted ? "bg-stone-100/40" : "bg-gradient-to-r from-white/40 to-white/10"}`}
-      >
-        {isCompleted && (
-          <Link
-            href={`/loan/${loan.id}`}
-            className="inline-flex w-full items-center justify-center rounded-full border border-outline-variant/30 bg-white/60 px-5 py-2.5 text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface/60 transition hover:bg-white hover:text-primary sm:w-auto"
-          >
-            View History
-          </Link>
+                <div className="mt-2 border-t border-white/50 pt-2 sm:border-t-border/50">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="text-[0.62rem] uppercase tracking-[0.15em] text-muted-foreground">
+                      Last Activity
+                    </div>
+                    <div className="min-w-0 text-right">
+                      <div className="truncate text-xs font-semibold text-foreground sm:text-sm">
+                        {lastActivity.label}
+                      </div>
+                      <div className="text-[0.68rem] text-muted-foreground">
+                        {formatShortDate(lastActivity.date)}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Financial Breakdown Box (Total, Repaid, Open) */}
+              <div
+                className={`rounded-[1.1rem] border px-2.5 py-2.5 sm:rounded-[1.35rem] sm:p-3.5 ${isCompleted ? "border-stone-200 bg-stone-100/50" : "border-white/60 bg-background/65"}`}
+              >
+                <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
+                  <div className="min-w-0">
+                    <div className={`truncate text-[0.58rem] font-bold uppercase tracking-[0.14em] ${isCompleted ? "text-stone-500" : "text-muted-foreground"}`}>
+                      The Support
+                    </div>
+                    <div className={`mt-1 truncate text-[0.95rem] font-semibold sm:mt-1.5 sm:text-lg ${isCompleted ? "text-stone-700" : ""}`} title={formatCurrency(loan.amount)}>
+                      {formatCurrency(loan.amount)}
+                    </div>
+                  </div>
+                  <div className="min-w-0 text-center">
+                    <div className={`truncate text-[0.58rem] font-bold uppercase tracking-[0.14em] ${isCompleted ? "text-stone-500" : "text-muted-foreground"}`}>
+                      Flowed Back
+                    </div>
+                    <div className={`mt-1 truncate text-[0.95rem] font-semibold sm:mt-1.5 sm:text-lg ${isCompleted ? "text-stone-700" : "text-emerald-600"}`} title={formatCurrency(confirmedPayments)}>
+                      {formatCurrency(confirmedPayments)}
+                    </div>
+                  </div>
+                  <div className="min-w-0 text-right">
+                    <div className={`truncate text-[0.58rem] font-bold uppercase tracking-[0.14em] ${isCompleted ? "text-stone-500" : "text-muted-foreground"}`}>
+                      Remaining
+                    </div>
+                    <div className={`mt-1 truncate text-[0.95rem] font-semibold sm:mt-1.5 sm:text-lg ${isCompleted ? "text-stone-600" : ""}`} title={formatCurrency(outstanding)}>
+                      {formatCurrency(outstanding)}
+                    </div>
+                  </div>
+                </div>
+
+                {loan.amount > 0 && (
+                  <div className="mt-3 space-y-1 border-t border-border/40 pt-2">
+                    <div className="flex items-center justify-between text-[0.62rem] text-muted-foreground">
+                      <span>Settlement Progress</span>
+                      <span className="font-semibold text-foreground">{percentRepaid}%</span>
+                    </div>
+                    <div className="h-1.5 w-full overflow-hidden rounded-full bg-stone-200/70">
+                      <div
+                        className={`h-full rounded-full transition-all duration-500 ${isCompleted ? "bg-stone-500" : percentRepaid > 0 ? "bg-emerald-500" : "bg-transparent"}`}
+                        style={{ width: `${percentRepaid}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Pending Repayments / Review Actions */}
+              {(pendingRepayments.length > 0 || rejectedRepayments.length > 0) && (
+                <div className="space-y-2 border-t border-border/70 pt-2.5 sm:space-y-2.5 sm:pt-3">
+                  {pendingRepayments.map((transaction) => (
+                    <div
+                      key={transaction.id}
+                      className="space-y-2 rounded-[1.1rem] border border-amber-500/20 bg-amber-50/50 p-2.5 sm:rounded-[1.2rem] sm:p-3"
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="text-xs sm:text-sm">
+                          Repayment of{" "}
+                          <span className="font-semibold">
+                            {formatCurrency(transaction.amount)}
+                          </span>
+                        </div>
+                        <Badge variant="outline" className={statusTone(transaction.status)}>
+                          {transaction.status}
+                        </Badge>
+                      </div>
+
+                      {isLender ? (
+                        <div className="space-y-2">
+                          <p className="text-xs text-amber-700">
+                            Review this repayment directly here.
+                          </p>
+                          <TransactionReviewActions
+                            loanId={loan.id}
+                            transactionId={transaction.id}
+                          />
+                        </div>
+                      ) : (
+                        <p className="text-xs text-amber-700">
+                          Waiting for {lenderName} to approve.
+                        </p>
+                      )}
+                    </div>
+                  ))}
+
+                  {isBorrower &&
+                    rejectedRepayments.map((transaction) => (
+                      <div
+                        key={transaction.id}
+                        className="rounded-[1.1rem] border border-rose-500/20 bg-rose-50/50 p-2.5 sm:rounded-[1.2rem] sm:p-3"
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="text-xs sm:text-sm">
+                            Repayment of{" "}
+                            <span className="font-semibold">
+                              {formatCurrency(transaction.amount)}
+                            </span>{" "}
+                            was rejected.
+                          </div>
+                          <Badge variant="outline" className={statusTone(transaction.status)}>
+                            {transaction.status}
+                          </Badge>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              )}
+
+              {/* Action Buttons & History Link */}
+              <div className="flex items-center justify-between gap-2 pt-2 border-t border-border/40">
+                <Link
+                  href={`/loan/${loan.id}`}
+                  className="text-[0.68rem] font-bold uppercase tracking-[0.14em] text-muted-foreground hover:text-foreground transition hover:underline"
+                >
+                  {isCompleted ? "View History →" : "Details & History →"}
+                </Link>
+                <div className="flex items-center gap-2">
+                  {loan.status === "PENDING" && isBorrower && (
+                    <AcknowledgeLoanButton loanId={loan.id} />
+                  )}
+                  {loan.status === "PENDING" && isLender && (
+                    <span className="rounded-full border border-amber-500/20 bg-amber-50/70 px-2.5 py-1 text-[0.62rem] font-semibold text-amber-800">
+                      Awaiting review
+                    </span>
+                  )}
+                  {loan.status === "ACTIVE" && isBorrower && outstanding > 0 && (
+                    <RepaymentDialog
+                      loanId={loan.id}
+                      outstanding={outstanding}
+                      counterpartyName={loan.lender.name || loan.lender.email || "the other person"}
+                    />
+                  )}
+                </div>
+              </div>
+            </div>
+          </motion.div>
         )}
-        {loan.status === "PENDING" && isBorrower && (
-          <AcknowledgeLoanButton loanId={loan.id} />
-        )}
-        {loan.status === "PENDING" && isLender && (
-          <p className="w-full rounded-[1.1rem] border border-amber-500/15 bg-amber-50/50 px-3 py-2 text-center text-xs text-amber-700 sm:rounded-[1.2rem] sm:py-2.5">
-            Waiting for {borrowerName} to review this record.
-          </p>
-        )}
-        {loan.status === "ACTIVE" && isBorrower && outstanding > 0 && (
-          <RepaymentDialog
-            loanId={loan.id}
-            outstanding={outstanding}
-            counterpartyName={loan.lender.name || loan.lender.email || "the other person"}
-          />
-        )}
-      </CardFooter>
+      </AnimatePresence>
     </Card>
   );
 }
