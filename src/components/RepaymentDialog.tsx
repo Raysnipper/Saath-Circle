@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { formatCurrency } from "@/lib/money";
 
 export function RepaymentDialog({
   loanId,
@@ -91,8 +92,7 @@ export function RepaymentDialog({
             {counterpartyName}
           </div>
           <div className="mt-3 text-sm text-muted-foreground">
-            Outstanding balance: {"\u20B9"}
-            {outstanding.toFixed(2)}
+            Outstanding balance: {formatCurrency(outstanding)}
           </div>
         </div>
 

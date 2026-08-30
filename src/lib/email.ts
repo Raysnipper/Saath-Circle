@@ -1,5 +1,6 @@
 import nodemailer from "nodemailer";
 import { getOptionalEnv, warnMissingEnv } from "@/lib/env";
+import { formatCurrency } from "@/lib/money";
 
 type BorrowerNotificationInput = {
   borrowerEmail: string;
@@ -32,6 +33,16 @@ type LenderRepaymentInput = {
   outstandingAmount: number;
 };
 
+type BorrowerNudgeInput = {
+  borrowerEmail: string;
+  borrowerName?: string | null;
+  lenderName?: string | null;
+  lenderEmail?: string | null;
+  loanId: string;
+  loanTitle?: string | null;
+  outstandingAmount: number;
+};
+
 type EmailResult = { sent: true } | { sent: false; reason: string };
 
 function capitalizeName(name: string) {
@@ -42,7 +53,7 @@ function capitalizeName(name: string) {
 }
 
 function formatMoney(amount: number) {
-  return `INR ${amount.toFixed(2)}`;
+  return formatCurrency(amount);
 }
 
 function getBaseUrl() {

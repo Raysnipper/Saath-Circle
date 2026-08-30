@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { getLastActivity } from "@/lib/loan-history";
-import { moneyToNumber } from "@/lib/money";
+import { formatCurrency, moneyToNumber } from "@/lib/money";
 import { LoanCard } from "@/components/LoanCard";
 import { LoanForm } from "@/components/LoanForm";
 import { Nav } from "@/components/Nav";
@@ -174,28 +174,28 @@ export default async function Home({
             </header>
 
             <div className="grid gap-2.5 grid-cols-2 sm:grid-cols-3 sm:gap-4">
-              <div className="dashboard-card col-span-2 p-6 sm:col-span-1 sm:p-8 flex flex-col items-center justify-center text-center">
-                <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-on-surface/40 mb-4 sm:mb-5">
+              <div className="dashboard-card col-span-2 min-w-0 p-5 sm:col-span-1 sm:p-7 flex flex-col items-center justify-center text-center">
+                <p className="text-[10px] uppercase font-bold tracking-[0.2em] text-on-surface/40 mb-2 sm:mb-4">
                   The Mutual Standing
                 </p>
-                <div className={`font-sans text-[2.2rem] sm:text-[2.8rem] font-bold leading-none tracking-tight tabular-nums ${netBalance > 0 ? "text-[#84A98C]" : netBalance < 0 ? "text-[#E07A5F]" : "text-primary"}`}>
-                  {"\u20B9"}{Math.abs(netBalance).toFixed(2)}
+                <div className={`font-sans text-2xl sm:text-3xl lg:text-4xl font-bold leading-none tracking-tight tabular-nums truncate max-w-full ${netBalance > 0 ? "text-[#84A98C]" : netBalance < 0 ? "text-[#E07A5F]" : "text-primary"}`}>
+                  {formatCurrency(netBalance)}
                 </div>
               </div>
-              <div className="dashboard-card p-6 sm:p-8 flex flex-col items-center justify-center text-center">
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface/40 mb-4 sm:mb-5">
+              <div className="dashboard-card min-w-0 p-4 sm:p-7 flex flex-col items-center justify-center text-center">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface/40 mb-2 sm:mb-4 truncate max-w-full">
                   Support Sent
                 </p>
-                <div className="font-sans text-[2.2rem] sm:text-[2.8rem] font-bold leading-none tracking-tight tabular-nums text-[#84A98C]">
-                  {"\u20B9"}{owedToYou.toFixed(2)}
+                <div className="font-sans text-xl sm:text-2xl lg:text-3xl font-bold leading-none tracking-tight tabular-nums text-[#84A98C] truncate max-w-full">
+                  {formatCurrency(owedToYou)}
                 </div>
               </div>
-              <div className="dashboard-card p-6 sm:p-8 flex flex-col items-center justify-center text-center">
-                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface/40 mb-4 sm:mb-5">
+              <div className="dashboard-card min-w-0 p-4 sm:p-7 flex flex-col items-center justify-center text-center">
+                <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface/40 mb-2 sm:mb-4 truncate max-w-full">
                   Support Received
                 </p>
-                <div className="font-sans text-[2.2rem] sm:text-[2.8rem] font-bold leading-none tracking-tight tabular-nums text-[#E07A5F]">
-                  {"\u20B9"}{youOwe.toFixed(2)}
+                <div className="font-sans text-xl sm:text-2xl lg:text-3xl font-bold leading-none tracking-tight tabular-nums text-[#E07A5F] truncate max-w-full">
+                  {formatCurrency(youOwe)}
                 </div>
               </div>
             </div>
