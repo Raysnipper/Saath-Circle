@@ -1,31 +1,40 @@
 # Next Session Todo (Saath Circle)
 
-## ✅ Current Status & Achieved Today
-- **Virtual Chai / Nudge Feature:**
-  - Built full-stack Nudge functionality (API route, front-end Dialog).
-  - Designed custom HTML email notification via Nodemailer and styled "Virtual Chai" theme.
-  - Added `lastNudgedAt` to the `Loan` database schema to persist a 24-hour pulsing/glowing Chai icon state.
-- **Dashboard Layout & Polish (2026 Theme):**
-  - Updated terminology ("Start a Handshake", "Support Extended", "Support Received", "Your Active Bonds").
-  - Restructured the Search Bar and Filter Tabs into a smart, responsive layout (perfect left-edge alignment to handle varying device sizes).
-  - Refined hover states for "Sign Out" to exactly match the deep brown secondary buttons.
-- **Infrastructure:**
-  - Diagnosed and fixed the Vercel 500 server exception by adding `prisma db push` to the build script to easily automate schema changes on Neon.
-  - Wiped dummy data in the live Neon DB to reset the app state.
+## ✅ Accomplished in This Session
+- **Indian Number Formatting & Conditional Decimals:**
+  - Standardized currency formatting across the app via `src/lib/money.ts` using `en-IN` locale (`₹10,90,000`, `₹0`).
+  - Conditional decimals: whole rupee numbers display cleanly without decimals, displaying decimals only when fractions (paise/cents) exist.
+  - Synchronized across dashboard cards, repayment dialog, timeline details, and outgoing email templates.
+- **Zero Mobile Overflow on Metric Cards:**
+  - Updated "The Mutual Standing", "Support Sent", and "Support Received" cards with responsive typography (`min-w-0`, `truncate`, `max-w-full`) to guarantee zero text overflow on narrow mobile screens.
+- **Inline Mobile Search Bar:**
+  - Styled the search bar and "SEARCH" button to sit snugly side-by-side on the exact same row on mobile devices (`flex-nowrap`, `flex-1 min-w-0`).
+- **Collapsible Compact Cards (~75px):**
+  - Eliminated endless mobile scrolling by making bond cards compact by default (~75px height, showing 5–6 records per screen).
+  - Implemented smooth tap-to-expand animation (`framer-motion`) revealing timeline dates, financial breakdown progress bar, nudge button, and action controls.
+- **"By Circle" (People Grouped View):**
+  - Built a segmented view switcher (`Records` vs `By Circle`).
+  - Implemented `PersonCircleCard` grouping shared bonds by contact, displaying total net balance (`+₹40,000 Owes You` / `-₹10,000 You Owe` / `₹0 Settled`), aggregate extended/received metrics, and nested expandable bond history.
+- **Production Git & Data Safety:**
+  - Resolved `git push` rejection cleanly by rebasing on `origin/main` without losing any live production features or database records.
 
-## ⏳ Highest Priority Next / Open Items
-1. **Relationship Summary - The "Circle Visualizer"**
-   - *Requirement:* Implement a soft, glowing ring graphic in the dashboard stats section that shifts color (Sage Green to Terracotta) based on which way the support is flowing (Net Balance).
-2. **Contact Us Page**
-   - *Requirement:* Create a dummy "Contact Us" page that says Under Construction or something graceful.
-3. **Production Validation**
-   - Final end-to-end verification of the Nodemailer SMTP live in Vercel.
+---
 
-## Nice To Revisit After V1
-- Notification preferences toggle.
-- Categories/notes on transactions.
-- Export/shareable CSV summaries.
+## ⏳ Prioritized Backlog for Next Session
+1. **WhatsApp / Text Shareable Summary:**
+   - Add a "Share to WhatsApp" / "Copy Summary" button on active and settled bonds to generate a friendly summary text snippet for messaging.
+2. **Repayment Notes & UTR / Transaction Reference:**
+   - Allow an optional note/reference field (e.g. *"GPay Ref: 4829..."*, *"Rent split"*) when submitting a repayment.
+3. **Download Settlement Receipt (PDF/CSV):**
+   - Provide a downloadable, branded PDF or CSV settlement receipt when a bond completes.
+4. **Relationship Summary Aura / Circle Visualizer:**
+   - Ambient glowing ring in the dashboard stats section that gently shifts tone (Sage Green to Warm Terracotta) based on net balance.
+5. **Contact Us / About Page:**
+   - Create a clean, warm "Contact Us" page for user feedback and support.
 
-## Important Context
-- Remember that `npx prisma studio` connects to whatever database is in your local `.env`. 
-- Vercel deployments will now automatically apply Prisma Schema changes during `npm run build`.
+---
+
+## 💡 Important Context
+- All changes were achieved on the frontend / calculation layer with **zero database schema modifications**, keeping live Neon database data 100% safe.
+- Repository is clean and synced with `origin/main`. Run `git push` to deploy local commits to Vercel production.
+
