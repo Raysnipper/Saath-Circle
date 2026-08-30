@@ -209,7 +209,7 @@ export default async function Home({
                   <form
                     action="/"
                     method="get"
-                    className="flex w-full flex-wrap gap-2 sm:flex-nowrap"
+                    className="flex w-full items-center gap-2 flex-nowrap"
                   >
                       {filter !== "all" && (
                         <input type="hidden" name="filter" value={filter} />
@@ -223,18 +223,18 @@ export default async function Home({
                         type="search"
                         defaultValue={query}
                         placeholder="Find a person or a promise..."
-                        className="h-9 min-w-0 basis-full flex-1 rounded-full border border-outline-variant/30 bg-white/70 px-4 text-[0.74rem] text-primary outline-none transition placeholder:text-on-surface/40 focus:border-primary/30 focus:ring-2 focus:ring-primary/20 sm:h-10 sm:min-w-[18rem] sm:basis-auto sm:text-[0.8rem]"
+                        className="h-9 min-w-0 flex-1 rounded-full border border-outline-variant/30 bg-white/70 px-4 text-[0.74rem] text-primary outline-none transition placeholder:text-on-surface/40 focus:border-primary/30 focus:ring-2 focus:ring-primary/20 sm:h-10 sm:min-w-[18rem] sm:text-[0.8rem]"
                       />
                       <button
                         type="submit"
-                        className="inline-flex h-9 shrink-0 items-center justify-center rounded-full bg-primary px-5 text-[0.68rem] font-bold uppercase tracking-widest text-on-primary transition hover:opacity-90 sm:h-10 sm:text-[0.72rem]"
+                        className="inline-flex h-9 shrink-0 items-center justify-center rounded-full bg-primary px-4 text-[0.68rem] font-bold uppercase tracking-widest text-on-primary transition hover:opacity-90 sm:h-10 sm:px-5 sm:text-[0.72rem]"
                       >
                         Search
                       </button>
                       {query && (
                         <Link
                           href={filter === "all" ? "/" : `/?filter=${filter}`}
-                          className="inline-flex h-9 shrink-0 items-center justify-center rounded-full border border-outline-variant/30 bg-white/70 px-5 text-[0.68rem] font-bold uppercase tracking-widest text-on-surface/60 transition hover:bg-white hover:text-primary sm:h-10 sm:text-[0.72rem]"
+                          className="inline-flex h-9 shrink-0 items-center justify-center rounded-full border border-outline-variant/30 bg-white/70 px-3.5 text-[0.68rem] font-bold uppercase tracking-widest text-on-surface/60 transition hover:bg-white hover:text-primary sm:h-10 sm:px-5 sm:text-[0.72rem]"
                         >
                           Clear
                         </Link>
